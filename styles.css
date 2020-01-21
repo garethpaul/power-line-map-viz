@@ -1,0 +1,58 @@
+body { margin:0; padding:0; font-family: 'Roboto', sans-serif; }
+
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+#menu {
+background: #fff;
+position: absolute;
+z-index: 1;
+top: 10px;
+left: 10px;
+border-radius: 7px;
+width: 120px;
+border: 1px solid #333333;
+font-family: 'Roboto', sans-serif;
+}
+
+#menu h1 {
+text-align: center;
+font-size: 17px;
+} 
+
+#menu img {
+width:100px;
+}
+
+#menu a {
+font-size: 13px;
+color: #404040;
+display: block;
+margin: 0;
+padding: 0;
+padding: 10px;
+text-decoration: none;
+border-bottom: 1px solid #333333;
+text-align: center;
+}
+
+#menu a:last-child {
+border: none;
+}
+
+#menu a:hover {
+background-color: #f8f8f8;
+color: #404040;
+}
+
+#menu a.active {
+background-color: #333333;
+color: #fefefe;
+}
+
+.mapbox-improve-map {
+display: none;
+}
+
+.mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-attrib {
+display:none;
+}
