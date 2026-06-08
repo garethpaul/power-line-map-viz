@@ -47,12 +47,13 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Running or Using the Project
 
 - Open `index.html` in a browser or serve the directory with a static file server.
-- Set a local Mapbox access token in `map-script.js` for manual map rendering, but do not commit real tokens.
+- The checked-in page shows a browser warning until a Mapbox token is configured.
+- Set a local Mapbox access token in `map-script.js` for manual map rendering, then reset it to an empty string before running verification or committing.
 
 ## Testing and Verification
 
 - Run `make verify` before committing map asset, GeoJSON, or HTML script changes.
-- The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
+- The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, the no-token browser fallback, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 

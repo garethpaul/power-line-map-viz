@@ -30,6 +30,22 @@ if (/mapboxgl\.accessToken\s*=\s*['"][^'"]+['"]/.test(script)) {
   fail('map-script.js must not commit a non-empty Mapbox access token');
 }
 
+if (/mapboxAccessToken\s*=\s*['"][^'"]+['"]/.test(script)) {
+  fail('map-script.js must keep mapboxAccessToken empty by default');
+}
+
+if (!/id=['"]map-token-warning['"]/.test(indexHtml)) {
+  fail('index.html must include the no-token map warning container');
+}
+
+if (!/function\s+showMapTokenWarning\b/.test(script)) {
+  fail('map-script.js must expose a browser-visible no-token warning');
+}
+
+if (!/typeof\s+mapboxgl\s*===\s*['"]undefined['"]/.test(script)) {
+  fail('map-script.js must guard against Mapbox GL JS failing to load');
+}
+
 for (const match of script.matchAll(/['"]((?:geojson|images)\/[^'"]+)['"]/g)) {
   exists(match[1], 'map-script.js');
 }

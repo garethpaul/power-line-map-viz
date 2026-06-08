@@ -19,13 +19,14 @@ Priority:
 - Keep layer toggles and power-line animation easy to understand
 - Maintain `make verify` as the local map asset and data-reference gate
 - Avoid committing real Mapbox access tokens
+- Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible
 
 Next priorities:
 
 - Add README setup notes for Mapbox token configuration
 - Document the source and freshness of each GeoJSON dataset
-- Add a no-token local-development fallback or clear failure message
+- Add a small fixture GeoJSON layer for local demos without Git LFS
 
 Contribution rules:
 

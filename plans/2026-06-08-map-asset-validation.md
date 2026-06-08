@@ -29,6 +29,5 @@ files because `git lfs` is not installed.
 
 ## Follow-Up Candidates
 
-- Add a no-token browser fallback message.
 - Document dataset source URLs and refresh dates.
 - Add a small fixture GeoJSON layer for local demos without Git LFS.
