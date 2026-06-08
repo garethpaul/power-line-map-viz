@@ -1,0 +1,24 @@
+# Dataset Inventory
+
+This repository stores infrastructure map layers as local GeoJSON files or Git
+LFS pointer files. Treat the checked-in data as prototype evidence, not as a
+fresh or authoritative public-safety source.
+
+Source status: unknown. The original source URLs, collection methods, license
+terms, and refresh dates are not recorded in this repository yet.
+
+| File | Map layer | Checked-in state | Current known size | Handling rule |
+| --- | --- | --- | --- | --- |
+| geojson/power_lines.geojson | `power_lines` | Git LFS pointer | 128064384 bytes | Document source URL, license, and refresh date before replacing or refreshing. |
+| geojson/power_stations.geojson | `power_stations` | Git LFS pointer | 45409768 bytes | Document source URL, license, and refresh date before replacing or refreshing. |
+| geojson/cell_towers.geojson | `cell_towers` | Git LFS pointer | 11496172 bytes | Document source URL, license, and refresh date before replacing or refreshing. |
+
+## Maintenance Rules
+
+- Keep private infrastructure data out of this repository.
+- Do not treat these layers as operational, emergency, or compliance-grade
+  data until source and freshness are documented.
+- Record source URL, license or permission basis, collection date, refresh
+  date, and transformation notes before committing refreshed datasets.
+- Keep Mapbox access tokens out of the repository; use local configuration for
+  manual rendering.

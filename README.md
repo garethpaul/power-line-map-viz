@@ -14,6 +14,7 @@ This README is based on the checked-in source, manifests, scripts, and repositor
 - `SECURITY.md` - security reporting and disclosure guidance
 - `CHANGES.md` - notable maintenance changes
 - `Makefile` - local verification entry points
+- `DATASETS.md` - dataset provenance, freshness, and handling notes
 - `geojson` - local infrastructure datasets, stored as GeoJSON or Git LFS pointers
 - `images` - marker and map image assets
 - `docs/plans` - canonical completed maintenance plans
@@ -54,7 +55,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Testing and Verification
 
 - Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
-- The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, the no-token browser fallback, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
+- The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, the no-token browser fallback, dataset inventory coverage, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
 - It also requires a completed canonical plan under `docs/plans/`.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -73,8 +74,11 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
+- See `DATASETS.md` before adding or refreshing infrastructure layers.
 - See `docs/plans/2026-06-08-map-token-and-assets-baseline.md` for the
   canonical map-token and asset validation baseline.
+- See `docs/plans/2026-06-08-dataset-inventory-baseline.md` for the dataset
+  inventory baseline.
 
 ## Contributing
 

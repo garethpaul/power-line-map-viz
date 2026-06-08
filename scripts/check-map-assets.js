@@ -2,7 +2,6 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const path = require('node:path');
 
 const errors = [];
 
@@ -19,12 +18,31 @@ function exists(relativePath, context) {
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
+const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
+const datasetInventoryPath = 'DATASETS.md';
 
 exists(planPath, 'canonical docs plan');
-if (fs.existsSync(planPath)) {
-  const plan = fs.readFileSync(planPath, 'utf8');
+exists(datasetPlanPath, 'dataset inventory docs plan');
+exists(datasetInventoryPath, 'dataset inventory');
+
+for (const completedPlanPath of [planPath, datasetPlanPath]) {
+  if (!fs.existsSync(completedPlanPath)) {
+    continue;
+  }
+
+  const plan = fs.readFileSync(completedPlanPath, 'utf8');
   if (!/Status: Completed/.test(plan) || !plan.includes('make check')) {
-    fail(`${planPath} must record completed status and make check verification`);
+    fail(`${completedPlanPath} must record completed status and make check verification`);
+  }
+}
+
+const datasetInventory = fs.existsSync(datasetInventoryPath)
+  ? fs.readFileSync(datasetInventoryPath, 'utf8')
+  : '';
+
+for (const term of ['Source status: unknown', 'refresh date', 'private infrastructure', 'Git LFS']) {
+  if (!datasetInventory.includes(term)) {
+    fail(`${datasetInventoryPath} must document ${term}`);
   }
 }
 
@@ -60,12 +78,19 @@ for (const match of script.matchAll(/['"]((?:geojson|images)\/[^'"]+)['"]/g)) {
 }
 
 for (const file of fs.readdirSync('geojson').filter(name => name.endsWith('.geojson')).sort()) {
-  const relativePath = path.join('geojson', file);
+  const relativePath = `geojson/${file}`;
   const content = fs.readFileSync(relativePath, 'utf8');
 
+  if (!datasetInventory.includes(`| ${relativePath} |`)) {
+    fail(`${datasetInventoryPath} is missing ${relativePath}`);
+  }
+
   if (content.startsWith('version https://git-lfs.github.com/spec/v1')) {
-    if (!/^oid sha256:[a-f0-9]{64}$/m.test(content) || !/^size \d+$/m.test(content)) {
+    const sizeMatch = content.match(/^size (\d+)$/m);
+    if (!/^oid sha256:[a-f0-9]{64}$/m.test(content) || !sizeMatch) {
       fail(`${relativePath} is not a valid Git LFS pointer`);
+    } else if (!datasetInventory.includes(`${sizeMatch[1]} bytes`)) {
+      fail(`${datasetInventoryPath} must record the current LFS size for ${relativePath}`);
     }
     continue;
   }

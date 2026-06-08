@@ -13,7 +13,7 @@ token, data-source, and layer assumptions explicit.
 
 Current baseline: `make check` verifies local asset references, GeoJSON or Git
 LFS pointer shape, empty Mapbox token state, no-token browser fallback behavior,
-and canonical `docs/plans` coverage.
+dataset inventory coverage, and canonical `docs/plans` coverage.
 
 The current focus is:
 
@@ -26,11 +26,13 @@ Priority:
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible
+- Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 
 Next priorities:
 
 - Add README setup notes for Mapbox token configuration
-- Document the source and freshness of each GeoJSON dataset
+- Replace unknown dataset source/freshness notes with concrete source URLs,
+  licenses, and refresh dates
 - Add a small fixture GeoJSON layer for local demos without Git LFS
 
 Contribution rules:
