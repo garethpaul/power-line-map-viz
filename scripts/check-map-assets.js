@@ -19,13 +19,15 @@ const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
+const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
 const datasetInventoryPath = 'DATASETS.md';
 
 exists(planPath, 'canonical docs plan');
 exists(datasetPlanPath, 'dataset inventory docs plan');
+exists(layerInventoryPlanPath, 'layer inventory docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -39,6 +41,20 @@ for (const completedPlanPath of [planPath, datasetPlanPath]) {
 const datasetInventory = fs.existsSync(datasetInventoryPath)
   ? fs.readFileSync(datasetInventoryPath, 'utf8')
   : '';
+
+const geojsonReferences = new Set(
+  Array.from(script.matchAll(/['"](geojson\/[^'"]+\.geojson)['"]/g), match => match[1])
+);
+const mapLayerIds = new Set(
+  Array.from(script.matchAll(/map\.addLayer\(\{[\s\S]*?['"]id['"]\s*:\s*['"]([^'"]+)['"]/g), match => match[1])
+);
+const toggleLayerIds = new Set(
+  Array.from(script.matchAll(/\{\s*['"]id['"]\s*:\s*['"]([^'"]+)['"]\s*,\s*['"]name['"]\s*:/g), match => match[1])
+);
+
+function layerIdForGeojson(relativePath) {
+  return relativePath.replace(/^geojson\//, '').replace(/\.geojson$/, '');
+}
 
 for (const term of ['Source status: unknown', 'refresh date', 'private infrastructure', 'Git LFS']) {
   if (!datasetInventory.includes(term)) {
@@ -79,10 +95,27 @@ for (const match of script.matchAll(/['"]((?:geojson|images)\/[^'"]+)['"]/g)) {
 
 for (const file of fs.readdirSync('geojson').filter(name => name.endsWith('.geojson')).sort()) {
   const relativePath = `geojson/${file}`;
+  const layerId = layerIdForGeojson(relativePath);
   const content = fs.readFileSync(relativePath, 'utf8');
 
   if (!datasetInventory.includes(`| ${relativePath} |`)) {
     fail(`${datasetInventoryPath} is missing ${relativePath}`);
+  }
+
+  if (!datasetInventory.includes(`| ${relativePath} | \`${layerId}\` |`)) {
+    fail(`${datasetInventoryPath} must record ${relativePath} with map layer \`${layerId}\``);
+  }
+
+  if (!geojsonReferences.has(relativePath)) {
+    fail(`map-script.js must reference checked-in layer data ${relativePath}`);
+  }
+
+  if (!mapLayerIds.has(layerId)) {
+    fail(`map-script.js must add a map layer with id ${layerId} for ${relativePath}`);
+  }
+
+  if (!toggleLayerIds.has(layerId)) {
+    fail(`map-script.js must expose a layer toggle for ${layerId}`);
   }
 
   if (content.startsWith('version https://git-lfs.github.com/spec/v1')) {

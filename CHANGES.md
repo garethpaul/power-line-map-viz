@@ -2,6 +2,8 @@
 
 ## 2026-06-08
 
+- Added layer inventory validation so checked-in GeoJSON files, Mapbox layer
+  IDs, layer toggles, and `DATASETS.md` rows stay aligned.
 - Added `DATASETS.md` and validation coverage for infrastructure dataset
   provenance and LFS pointer inventory.
 - Fixed `index.html` so it loads the checked-in `map-script.js` file.
