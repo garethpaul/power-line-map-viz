@@ -52,7 +52,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 ## Testing and Verification
 
-- Run `make verify` before committing map asset, GeoJSON, or HTML script changes.
+- Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
 - The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, the no-token browser fallback, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.

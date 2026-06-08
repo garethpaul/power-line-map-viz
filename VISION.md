@@ -17,7 +17,7 @@ Priority:
 
 - Preserve the local GeoJSON layer structure
 - Keep layer toggles and power-line animation easy to understand
-- Maintain `make verify` as the local map asset and data-reference gate
+- Maintain `make check` and `make verify` as the local map asset and data-reference gates
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible

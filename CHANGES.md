@@ -3,6 +3,7 @@
 ## 2026-06-08
 
 - Fixed `index.html` so it loads the checked-in `map-script.js` file.
+- Added `make check` as an alias for the existing map asset verification gate.
 - Added a Node-based map asset validator for local script/style references, marker images, GeoJSON references, Git LFS pointers, and empty Mapbox token state.
 - Added `make verify` as the local validation gate for static map changes.
 - Added a no-token browser warning so local viewers do not see a silent blank map when the checked-in token is empty.
