@@ -36,6 +36,11 @@ Contribution rules:
 
 ## Security And Responsible Use
 
+Canonical security policy and reporting:
+
+- [`SECURITY.md`](SECURITY.md)
+
+
 Infrastructure maps can expose sensitive operational context. Data sources,
 refresh dates, and public availability should be documented before adding or
 updating layers.
