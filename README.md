@@ -12,20 +12,28 @@ This README is based on the checked-in source, manifests, scripts, and repositor
 ## Repository Contents
 
 - `SECURITY.md` - security reporting and disclosure guidance
+- `CHANGES.md` - notable maintenance changes
+- `Makefile` - local verification entry points
+- `geojson` - local infrastructure datasets, stored as GeoJSON or Git LFS pointers
+- `images` - marker and map image assets
+- `plans` - completed maintenance plans
+- `scripts` - deterministic map asset validation checks
 - `VISION.md` - project direction and maintenance guardrails
 
 Additional scan context:
 
-- Source directories: no top-level source directories detected
-- Dependency and build manifests: none detected
-- Entry points or build surfaces: none detected
-- Test-looking files: no obvious test files detected
+- Source directories: geojson, images, scripts
+- Dependency and build manifests: Makefile
+- Entry points or build surfaces: index.html, map-script.js, Makefile
+- Test-looking files: scripts/check-map-assets.js
 
 ## Getting Started
 
 ### Prerequisites
 
 - Git
+- Node.js and `make`
+- Git LFS if you need hydrated GeoJSON data instead of pointer files
 
 ### Setup
 
@@ -38,11 +46,13 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 ## Running or Using the Project
 
-- No single runtime entry point was identified. Start by reading the source files and manifests listed above.
+- Open `index.html` in a browser or serve the directory with a static file server.
+- Set a local Mapbox access token in `map-script.js` for manual map rendering, but do not commit real tokens.
 
 ## Testing and Verification
 
-- No dedicated automated test command was identified from the checked-in files. Verify changes by running the relevant build or manually exercising the sample.
+- Run `make verify` before committing map asset, GeoJSON, or HTML script changes.
+- The verification gate checks local script/style references, marker and GeoJSON references, empty Mapbox token state, and either hydrated GeoJSON shape or valid Git LFS pointer metadata.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 

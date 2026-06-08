@@ -17,12 +17,12 @@ Priority:
 
 - Preserve the local GeoJSON layer structure
 - Keep layer toggles and power-line animation easy to understand
+- Maintain `make verify` as the local map asset and data-reference gate
 - Avoid committing real Mapbox access tokens
 - Make infrastructure data provenance visible
 
 Next priorities:
 
-- Fix the HTML script reference so it loads the checked-in map script
 - Add README setup notes for Mapbox token configuration
 - Document the source and freshness of each GeoJSON dataset
 - Add a no-token local-development fallback or clear failure message
