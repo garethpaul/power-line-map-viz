@@ -40,7 +40,7 @@ Infrastructure maps can expose sensitive operational context. Data sources,
 refresh dates, and public availability should be documented before adding or
 updating layers.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Private infrastructure datasets
 - Checked-in Mapbox tokens
