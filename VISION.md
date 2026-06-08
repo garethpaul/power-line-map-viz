@@ -46,3 +46,6 @@ updating layers.
 - Checked-in Mapbox tokens
 - Silent external data fetches
 - Visual rewrites that obscure layer provenance
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
