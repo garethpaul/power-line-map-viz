@@ -18,6 +18,15 @@ function exists(relativePath, context) {
 
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
+const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
+
+exists(planPath, 'canonical docs plan');
+if (fs.existsSync(planPath)) {
+  const plan = fs.readFileSync(planPath, 'utf8');
+  if (!/Status: Completed/.test(plan) || !plan.includes('make check')) {
+    fail(`${planPath} must record completed status and make check verification`);
+  }
+}
 
 for (const match of indexHtml.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=['"]([^'"]+)['"]/g)) {
   const reference = match[1];

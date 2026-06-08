@@ -11,6 +11,10 @@ overlays.
 The goal is to keep the visualization inspectable and reproducible while making
 token, data-source, and layer assumptions explicit.
 
+Current baseline: `make check` verifies local asset references, GeoJSON or Git
+LFS pointer shape, empty Mapbox token state, no-token browser fallback behavior,
+and canonical `docs/plans` coverage.
+
 The current focus is:
 
 Priority:
@@ -18,6 +22,7 @@ Priority:
 - Preserve the local GeoJSON layer structure
 - Keep layer toggles and power-line animation easy to understand
 - Maintain `make check` and `make verify` as the local map asset and data-reference gates
+- Keep completed maintenance plans under `docs/plans`
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible
