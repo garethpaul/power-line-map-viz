@@ -39,6 +39,10 @@ fixed remote URLs. Run `make check` before changing `index.html`; it rejects
 new remote script or stylesheet references unless they are explicitly
 allowlisted.
 
+The no-token Mapbox warning should remain an accessible status live region so
+users are told why the local map is not rendering instead of seeing a silent
+blank page.
+
 ## Dependency and Supply Chain Security
 
 Dependency updates should come from trusted package managers and should keep lockfiles in sync when lockfiles exist. Do not commit credentials, private keys, tokens, generated secrets, or machine-local configuration. If a vulnerability depends on a compromised package, typosquatting risk, insecure transitive dependency, or unsafe build step, include the package name, affected version, and the path through which it is used.

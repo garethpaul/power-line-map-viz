@@ -63,6 +63,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   a referenced marker image or a checked-in unused image.
 - It also checks the browser page title so the static map stays branded as
   Power Line Map instead of a generic placeholder.
+- It also checks that the no-token Mapbox warning remains an accessible status
+  live region.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
@@ -80,6 +82,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include map-script.js.
 - `make check` allowlists the browser's remote script/style assets so
   additional external dependencies cannot be added silently.
+- `make check` keeps the no-token Mapbox warning accessible with a status live
+  region.
 
 ## Maintenance Notes
 
@@ -98,6 +102,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   contract.
 - See `docs/plans/2026-06-09-remote-asset-allowlist.md` for the browser remote
   asset allowlist guard.
+- See `docs/plans/2026-06-09-map-token-warning-accessibility.md` for the
+  no-token warning accessibility guard.
 
 ## Contributing
 

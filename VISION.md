@@ -30,6 +30,7 @@ Priority:
 - Keep intentional remote browser assets allowlisted and explicit
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
+- Keep the no-token warning accessible as a status live region
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 

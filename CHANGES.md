@@ -8,6 +8,8 @@
   as referenced or unused in `DATASETS.md`.
 - Added a browser page title contract so `index.html` stays branded as Power
   Line Map instead of a generic map placeholder.
+- Added no-token warning accessibility validation for the Mapbox token fallback
+  message.
 - Added a remote browser asset allowlist for Mapbox GL JS/CSS and Google Fonts.
 - Added `DATASETS.md` and validation coverage for infrastructure dataset
   provenance and LFS pointer inventory.
