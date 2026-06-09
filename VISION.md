@@ -26,6 +26,7 @@ Priority:
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
+- Keep the browser page title aligned with the Power Line Map purpose
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible

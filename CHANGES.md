@@ -6,6 +6,8 @@
   IDs, layer toggles, and `DATASETS.md` rows stay aligned.
 - Added image asset inventory validation so checked-in marker images are listed
   as referenced or unused in `DATASETS.md`.
+- Added a browser page title contract so `index.html` stays branded as Power
+  Line Map instead of a generic map placeholder.
 - Added `DATASETS.md` and validation coverage for infrastructure dataset
   provenance and LFS pointer inventory.
 - Fixed `index.html` so it loads the checked-in `map-script.js` file.

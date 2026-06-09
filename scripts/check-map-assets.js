@@ -21,15 +21,17 @@ const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
 const imageInventoryPlanPath = 'docs/plans/2026-06-09-image-asset-inventory.md';
+const pageTitlePlanPath = 'docs/plans/2026-06-09-page-title-contract.md';
 const datasetInventoryPath = 'DATASETS.md';
 
 exists(planPath, 'canonical docs plan');
 exists(datasetPlanPath, 'dataset inventory docs plan');
 exists(layerInventoryPlanPath, 'layer inventory docs plan');
 exists(imageInventoryPlanPath, 'image asset inventory docs plan');
+exists(pageTitlePlanPath, 'page title docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -84,6 +86,10 @@ if (/mapboxAccessToken\s*=\s*['"][^'"]+['"]/.test(script)) {
 
 if (!/id=['"]map-token-warning['"]/.test(indexHtml)) {
   fail('index.html must include the no-token map warning container');
+}
+
+if (!/<title>Power Line Map<\/title>/.test(indexHtml)) {
+  fail('index.html must use the Power Line Map page title');
 }
 
 if (!/function\s+showMapTokenWarning\b/.test(script)) {
