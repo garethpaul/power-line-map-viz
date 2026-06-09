@@ -46,28 +46,35 @@ font-size: 17px;
 width:100px;
 }
 
-#menu a {
+#menu button {
 font-size: 13px;
 color: #404040;
 display: block;
+width: 100%;
 margin: 0;
 padding: 0;
 padding: 10px;
+background: transparent;
 text-decoration: none;
 border-bottom: 1px solid #333333;
+border-left: 0;
+border-right: 0;
+border-top: 0;
 text-align: center;
+font: inherit;
+cursor: pointer;
 }
 
-#menu a:last-child {
+#menu button:last-child {
 border: none;
 }
 
-#menu a:hover {
+#menu button:hover {
 background-color: #f8f8f8;
 color: #404040;
 }
 
-#menu a.active {
+#menu button.active {
 background-color: #333333;
 color: #fefefe;
 }

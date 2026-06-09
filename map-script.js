@@ -26,13 +26,14 @@ function setupLayerToggles(map) {
     layers.hidden = false;
 
     for (var i = 0; i < toggleableLayerIds.length; i++) {
-        var link = document.createElement('a');
-        link.href = '#';
+        var link = document.createElement('button');
+        link.type = 'button';
         link.className = 'active';
         link.textContent = toggleableLayerIds[i]['name'];
         link.dataset.layerId = toggleableLayerIds[i]['id'];
+        link.setAttribute('aria-pressed', 'true');
 
-        // Handle on click on link
+        // Handle clicks on the layer toggle button.
         link.onclick = function (e) {
             var clickedLayer = this.dataset.layerId;
             e.preventDefault();
@@ -48,8 +49,10 @@ function setupLayerToggles(map) {
             if (visibility === 'visible') {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                 this.className = '';
+                this.setAttribute('aria-pressed', 'false');
             } else {
                 this.className = 'active';
+                this.setAttribute('aria-pressed', 'true');
                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
             }
         };

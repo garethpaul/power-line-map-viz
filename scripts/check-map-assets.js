@@ -17,6 +17,7 @@ function exists(relativePath, context) {
 
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
+const styles = fs.readFileSync('styles.css', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
@@ -26,6 +27,7 @@ const remoteAssetPlanPath = 'docs/plans/2026-06-09-remote-asset-allowlist.md';
 const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warning-accessibility.md';
 const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
+const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -42,9 +44,10 @@ exists(remoteAssetPlanPath, 'remote asset allowlist docs plan');
 exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs plan');
 exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
+exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -130,6 +133,10 @@ if (!/<html\b[^>]*\blang=['"]en['"]/i.test(indexHtml)) {
   fail('index.html must set html lang="en"');
 }
 
+if (!/<nav\b[^>]*\bid=['"]menu['"][^>]*\baria-label=['"]Map layers['"]/i.test(indexHtml)) {
+  fail('index.html layer menu nav must expose aria-label="Map layers"');
+}
+
 const viewportTag = indexHtml.match(/<meta\b[^>]+name=['"]viewport['"][^>]*>/i);
 if (!viewportTag) {
   fail('index.html must include a viewport meta tag');
@@ -154,6 +161,28 @@ if (!/function\s+showMapTokenWarning\b/.test(script)) {
 
 if (!/typeof\s+mapboxgl\s*===\s*['"]undefined['"]/.test(script)) {
   fail('map-script.js must guard against Mapbox GL JS failing to load');
+}
+
+if (!/document\.createElement\(['"]button['"]\)/.test(script)) {
+  fail('map-script.js must create button controls for layer toggles');
+}
+
+if (!/link\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) {
+  fail('map-script.js must initialize layer toggles with aria-pressed="true"');
+}
+
+if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]false['"]\)/.test(script)) {
+  fail('map-script.js must mark hidden layer toggles with aria-pressed="false"');
+}
+
+if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) {
+  fail('map-script.js must mark visible layer toggles with aria-pressed="true"');
+}
+
+for (const selector of ['#menu button', '#menu button:last-child', '#menu button:hover', '#menu button.active']) {
+  if (!styles.includes(selector)) {
+    fail(`styles.css must style layer toggle selector ${selector}`);
+  }
 }
 
 for (const match of script.matchAll(/['"]((?:geojson|images)\/[^'"]+)['"]/g)) {

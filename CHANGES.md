@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Added layer toggle accessibility validation for labelled buttons and
+  `aria-pressed` state.
 - Added root HTML language validation so the static map page declares
   `lang="en"` for accessibility tooling.
 - Added a static `make build` gate for map asset validation.

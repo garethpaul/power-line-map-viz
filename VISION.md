@@ -14,7 +14,8 @@ token, data-source, and layer assumptions explicit.
 Current baseline: `make check` verifies local asset references, layer inventory
 consistency, GeoJSON or Git LFS pointer shape, empty Mapbox token state,
 no-token browser fallback behavior, browser remote asset allowlisting, dataset
-inventory coverage, and canonical `docs/plans` coverage.
+inventory coverage, layer toggle accessibility, and canonical `docs/plans`
+coverage.
 
 The current focus is:
 
@@ -34,6 +35,8 @@ Priority:
 - Keep the no-token warning accessible as a status live region
 - Keep browser zoom available for the static map page
 - Keep the static map page language declared for accessibility tooling
+- Keep layer toggles labelled and expose visible/hidden state to assistive
+  tooling
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 
