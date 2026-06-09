@@ -24,6 +24,7 @@ const imageInventoryPlanPath = 'docs/plans/2026-06-09-image-asset-inventory.md';
 const pageTitlePlanPath = 'docs/plans/2026-06-09-page-title-contract.md';
 const remoteAssetPlanPath = 'docs/plans/2026-06-09-remote-asset-allowlist.md';
 const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warning-accessibility.md';
+const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -38,9 +39,10 @@ exists(imageInventoryPlanPath, 'image asset inventory docs plan');
 exists(pageTitlePlanPath, 'page title docs plan');
 exists(remoteAssetPlanPath, 'remote asset allowlist docs plan');
 exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs plan');
+exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -120,6 +122,24 @@ if (!tokenWarningTag) {
 
 if (!/<title>Power Line Map<\/title>/.test(indexHtml)) {
   fail('index.html must use the Power Line Map page title');
+}
+
+const viewportTag = indexHtml.match(/<meta\b[^>]+name=['"]viewport['"][^>]*>/i);
+if (!viewportTag) {
+  fail('index.html must include a viewport meta tag');
+} else {
+  const viewportContent = viewportTag[0].match(/\bcontent=['"]([^'"]+)['"]/i)?.[1] || '';
+  if (!/width\s*=\s*device-width/i.test(viewportContent)) {
+    fail('index.html viewport must include width=device-width');
+  }
+
+  if (/user-scalable\s*=\s*no/i.test(viewportContent)) {
+    fail('index.html viewport must not disable user scaling');
+  }
+
+  if (/maximum-scale\s*=\s*1(?:\.0)?/i.test(viewportContent)) {
+    fail('index.html viewport must not cap maximum zoom at 1');
+  }
 }
 
 if (!/function\s+showMapTokenWarning\b/.test(script)) {

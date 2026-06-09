@@ -42,6 +42,8 @@ allowlisted.
 The no-token Mapbox warning should remain an accessible status live region so
 users are told why the local map is not rendering instead of seeing a silent
 blank page.
+The static page should keep browser zoom enabled; do not add viewport settings
+that disable user scaling or cap maximum zoom at 1.
 
 ## Dependency and Supply Chain Security
 

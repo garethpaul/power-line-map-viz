@@ -10,6 +10,8 @@
   Line Map instead of a generic map placeholder.
 - Added no-token warning accessibility validation for the Mapbox token fallback
   message.
+- Added viewport zoom accessibility validation so the map page does not disable
+  browser zoom.
 - Added a remote browser asset allowlist for Mapbox GL JS/CSS and Google Fonts.
 - Added `DATASETS.md` and validation coverage for infrastructure dataset
   provenance and LFS pointer inventory.

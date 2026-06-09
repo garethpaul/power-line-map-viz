@@ -65,6 +65,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Power Line Map instead of a generic placeholder.
 - It also checks that the no-token Mapbox warning remains an accessible status
   live region.
+- It also checks that the viewport keeps browser zoom available and uses
+  `width=device-width`.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
@@ -84,6 +86,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   additional external dependencies cannot be added silently.
 - `make check` keeps the no-token Mapbox warning accessible with a status live
   region.
+- `make check` keeps browser zoom enabled by rejecting viewport settings that
+  disable user scaling or cap maximum zoom at 1.
 
 ## Maintenance Notes
 
@@ -104,6 +108,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   asset allowlist guard.
 - See `docs/plans/2026-06-09-map-token-warning-accessibility.md` for the
   no-token warning accessibility guard.
+- See `docs/plans/2026-06-09-viewport-zoom-accessibility.md` for the viewport
+  zoom accessibility guard.
 
 ## Contributing
 

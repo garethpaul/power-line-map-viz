@@ -31,6 +31,7 @@ Priority:
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Keep the no-token warning accessible as a status live region
+- Keep browser zoom available for the static map page
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 
