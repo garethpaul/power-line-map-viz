@@ -24,6 +24,7 @@ Priority:
 - Keep layer toggles and power-line animation easy to understand
 - Maintain `make check` and `make verify` as the local map asset and data-reference gates
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
+- Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank

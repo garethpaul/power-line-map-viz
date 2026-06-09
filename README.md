@@ -59,6 +59,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
   hydrated GeoJSON shape or valid Git LFS pointer metadata.
+- It also checks that every checked-in `images/*` asset is inventoried as either
+  a referenced marker image or a checked-in unused image.
 - It also requires a completed canonical plan under `docs/plans/`.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -84,6 +86,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   inventory baseline.
 - See `docs/plans/2026-06-08-layer-inventory-validation.md` for the
   GeoJSON-to-map-layer inventory guard.
+- See `docs/plans/2026-06-09-image-asset-inventory.md` for the checked-in image
+  asset inventory guard.
 
 ## Contributing
 

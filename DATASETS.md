@@ -13,6 +13,18 @@ terms, and refresh dates are not recorded in this repository yet.
 | geojson/power_stations.geojson | `power_stations` | Git LFS pointer | 45409768 bytes | Document source URL, license, and refresh date before replacing or refreshing. |
 | geojson/cell_towers.geojson | `cell_towers` | Git LFS pointer | 11496172 bytes | Document source URL, license, and refresh date before replacing or refreshing. |
 
+## Image Asset Inventory
+
+| File | Map usage | Handling rule |
+| --- | --- | --- |
+| images/cali.png | Checked-in unused image | Document the intended map layer or remove it before adding more unused imagery. |
+| images/cell-towers.png | Referenced marker image | Keep aligned with the `cell_towers` layer and avoid replacing without source notes. |
+| images/gas-stations.png | Checked-in unused image | Document the intended map layer or remove it before adding more unused imagery. |
+| images/grocery-store.png | Checked-in unused image | Document the intended map layer or remove it before adding more unused imagery. |
+| images/hospital.png | Checked-in unused image | Document the intended map layer or remove it before adding more unused imagery. |
+| images/power-stations.png | Referenced marker image | Keep aligned with the `power_stations` layer and avoid replacing without source notes. |
+| images/shelters.png | Checked-in unused image | Document the intended map layer or remove it before adding more unused imagery. |
+
 ## Maintenance Rules
 
 - Keep private infrastructure data out of this repository.
@@ -20,5 +32,7 @@ terms, and refresh dates are not recorded in this repository yet.
   data until source and freshness are documented.
 - Record source URL, license or permission basis, collection date, refresh
   date, and transformation notes before committing refreshed datasets.
+- Keep image marker assets inventoried as referenced or checked-in unused before
+  adding new map layers.
 - Keep Mapbox access tokens out of the repository; use local configuration for
   manual rendering.

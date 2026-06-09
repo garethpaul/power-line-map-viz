@@ -4,6 +4,8 @@
 
 - Added layer inventory validation so checked-in GeoJSON files, Mapbox layer
   IDs, layer toggles, and `DATASETS.md` rows stay aligned.
+- Added image asset inventory validation so checked-in marker images are listed
+  as referenced or unused in `DATASETS.md`.
 - Added `DATASETS.md` and validation coverage for infrastructure dataset
   provenance and LFS pointer inventory.
 - Fixed `index.html` so it loads the checked-in `map-script.js` file.

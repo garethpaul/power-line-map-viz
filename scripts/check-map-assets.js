@@ -20,14 +20,16 @@ const script = fs.readFileSync('map-script.js', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
+const imageInventoryPlanPath = 'docs/plans/2026-06-09-image-asset-inventory.md';
 const datasetInventoryPath = 'DATASETS.md';
 
 exists(planPath, 'canonical docs plan');
 exists(datasetPlanPath, 'dataset inventory docs plan');
 exists(layerInventoryPlanPath, 'layer inventory docs plan');
+exists(imageInventoryPlanPath, 'image asset inventory docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -44,6 +46,9 @@ const datasetInventory = fs.existsSync(datasetInventoryPath)
 
 const geojsonReferences = new Set(
   Array.from(script.matchAll(/['"](geojson\/[^'"]+\.geojson)['"]/g), match => match[1])
+);
+const imageReferences = new Set(
+  Array.from(script.matchAll(/['"](images\/[^'"]+\.(?:png|jpg|jpeg|svg))['"]/g), match => match[1])
 );
 const mapLayerIds = new Set(
   Array.from(script.matchAll(/map\.addLayer\(\{[\s\S]*?['"]id['"]\s*:\s*['"]([^'"]+)['"]/g), match => match[1])
@@ -134,6 +139,24 @@ for (const file of fs.readdirSync('geojson').filter(name => name.endsWith('.geoj
     assert.ok(Array.isArray(parsed.features), 'features must be an array');
   } catch (error) {
     fail(`${relativePath} is not a valid GeoJSON FeatureCollection: ${error.message}`);
+  }
+}
+
+for (const file of fs.readdirSync('images').sort()) {
+  const relativePath = `images/${file}`;
+  if (!fs.statSync(relativePath).isFile()) {
+    continue;
+  }
+
+  if (!datasetInventory.includes(`| ${relativePath} |`)) {
+    fail(`${datasetInventoryPath} is missing image asset ${relativePath}`);
+  }
+
+  const expectedStatus = imageReferences.has(relativePath)
+    ? 'Referenced marker image'
+    : 'Checked-in unused image';
+  if (!datasetInventory.includes(`| ${relativePath} | ${expectedStatus} |`)) {
+    fail(`${datasetInventoryPath} must record ${relativePath} as ${expectedStatus}`);
   }
 }
 
