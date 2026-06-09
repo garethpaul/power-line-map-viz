@@ -22,16 +22,23 @@ const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
 const imageInventoryPlanPath = 'docs/plans/2026-06-09-image-asset-inventory.md';
 const pageTitlePlanPath = 'docs/plans/2026-06-09-page-title-contract.md';
+const remoteAssetPlanPath = 'docs/plans/2026-06-09-remote-asset-allowlist.md';
 const datasetInventoryPath = 'DATASETS.md';
+const allowedRemoteAssets = new Set([
+  'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
+  'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css',
+  'https://fonts.googleapis.com/css?family=Roboto&display=swap'
+]);
 
 exists(planPath, 'canonical docs plan');
 exists(datasetPlanPath, 'dataset inventory docs plan');
 exists(layerInventoryPlanPath, 'layer inventory docs plan');
 exists(imageInventoryPlanPath, 'image asset inventory docs plan');
 exists(pageTitlePlanPath, 'page title docs plan');
+exists(remoteAssetPlanPath, 'remote asset allowlist docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -69,10 +76,22 @@ for (const term of ['Source status: unknown', 'refresh date', 'private infrastru
   }
 }
 
+const remoteAssets = new Set();
 for (const match of indexHtml.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=['"]([^'"]+)['"]/g)) {
   const reference = match[1];
-  if (!reference.startsWith('http://') && !reference.startsWith('https://')) {
+  if (reference.startsWith('http://') || reference.startsWith('https://')) {
+    remoteAssets.add(reference);
+    if (!allowedRemoteAssets.has(reference)) {
+      fail(`index.html references unapproved remote asset: ${reference}`);
+    }
+  } else {
     exists(reference, 'index.html');
+  }
+}
+
+for (const expectedRemoteAsset of allowedRemoteAssets) {
+  if (!remoteAssets.has(expectedRemoteAsset)) {
+    fail(`index.html must keep approved remote asset: ${expectedRemoteAsset}`);
   }
 }
 

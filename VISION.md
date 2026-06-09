@@ -13,8 +13,8 @@ token, data-source, and layer assumptions explicit.
 
 Current baseline: `make check` verifies local asset references, layer inventory
 consistency, GeoJSON or Git LFS pointer shape, empty Mapbox token state,
-no-token browser fallback behavior, dataset inventory coverage, and canonical
-`docs/plans` coverage.
+no-token browser fallback behavior, browser remote asset allowlisting, dataset
+inventory coverage, and canonical `docs/plans` coverage.
 
 The current focus is:
 
@@ -27,6 +27,7 @@ Priority:
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
 - Keep the browser page title aligned with the Power Line Map purpose
+- Keep intentional remote browser assets allowlisted and explicit
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Make infrastructure data provenance visible

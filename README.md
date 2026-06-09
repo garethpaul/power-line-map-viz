@@ -63,6 +63,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   a referenced marker image or a checked-in unused image.
 - It also checks the browser page title so the static map stays branded as
   Power Line Map instead of a generic placeholder.
+- It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
+  Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -76,6 +78,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching external API calls or credential-adjacent configuration; examples from the scan include map-script.js.
 - Review changes touching network requests, sockets, or service endpoints; examples from the scan include index.html.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include map-script.js.
+- `make check` allowlists the browser's remote script/style assets so
+  additional external dependencies cannot be added silently.
 
 ## Maintenance Notes
 
@@ -92,6 +96,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   asset inventory guard.
 - See `docs/plans/2026-06-09-page-title-contract.md` for the browser page title
   contract.
+- See `docs/plans/2026-06-09-remote-asset-allowlist.md` for the browser remote
+  asset allowlist guard.
 
 ## Contributing
 
