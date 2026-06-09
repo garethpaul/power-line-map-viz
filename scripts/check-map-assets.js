@@ -25,6 +25,7 @@ const pageTitlePlanPath = 'docs/plans/2026-06-09-page-title-contract.md';
 const remoteAssetPlanPath = 'docs/plans/2026-06-09-remote-asset-allowlist.md';
 const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warning-accessibility.md';
 const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
+const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -40,9 +41,10 @@ exists(pageTitlePlanPath, 'page title docs plan');
 exists(remoteAssetPlanPath, 'remote asset allowlist docs plan');
 exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs plan');
 exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
+exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -122,6 +124,10 @@ if (!tokenWarningTag) {
 
 if (!/<title>Power Line Map<\/title>/.test(indexHtml)) {
   fail('index.html must use the Power Line Map page title');
+}
+
+if (!/<html\b[^>]*\blang=['"]en['"]/i.test(indexHtml)) {
+  fail('index.html must set html lang="en"');
 }
 
 const viewportTag = indexHtml.match(/<meta\b[^>]+name=['"]viewport['"][^>]*>/i);

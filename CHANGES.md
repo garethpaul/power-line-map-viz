@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-09
+
+- Added root HTML language validation so the static map page declares
+  `lang="en"` for accessibility tooling.
+- Added a static `make build` gate for map asset validation.
+
 ## 2026-06-08
 
 - Added layer inventory validation so checked-in GeoJSON files, Mapbox layer

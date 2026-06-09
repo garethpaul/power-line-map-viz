@@ -55,6 +55,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Testing and Verification
 
 - Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
+- Run `make build` for the static map validation gate; it uses the same
+  dependency-free validator as `make lint`.
 - The verification gate checks local script/style references, marker and
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
@@ -67,6 +69,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   live region.
 - It also checks that the viewport keeps browser zoom available and uses
   `width=device-width`.
+- It also checks that the root HTML element declares `lang="en"` for assistive
+  technology and browser language tooling.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
@@ -110,6 +114,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   no-token warning accessibility guard.
 - See `docs/plans/2026-06-09-viewport-zoom-accessibility.md` for the viewport
   zoom accessibility guard.
+- See `docs/plans/2026-06-09-html-language-accessibility.md` for the root HTML
+  language accessibility guard and static `make build` gate.
 
 ## Contributing
 

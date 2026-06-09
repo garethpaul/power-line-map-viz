@@ -22,7 +22,8 @@ Priority:
 
 - Preserve the local GeoJSON layer structure
 - Keep layer toggles and power-line animation easy to understand
-- Maintain `make check` and `make verify` as the local map asset and data-reference gates
+- Maintain `make check`, `make verify`, and `make build` as the local map asset
+  and data-reference gates
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
@@ -32,6 +33,7 @@ Priority:
 - Keep no-token local browsing explicit instead of silently blank
 - Keep the no-token warning accessible as a status live region
 - Keep browser zoom available for the static map page
+- Keep the static map page language declared for accessibility tooling
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 
