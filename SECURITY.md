@@ -42,6 +42,8 @@ allowlisted.
 The no-token Mapbox warning should remain an accessible status live region so
 users are told why the local map is not rendering instead of seeing a silent
 blank page.
+Hosted validation uses read-only repository access, pinned actions, and the
+dependency-free map contract gate; no package installation is required.
 The static page should keep browser zoom enabled; do not add viewport settings
 that disable user scaling or cap maximum zoom at 1.
 The root HTML language should stay declared so assistive technology and browser

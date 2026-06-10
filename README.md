@@ -13,6 +13,7 @@ This README is based on the checked-in source, manifests, scripts, and repositor
 
 - `SECURITY.md` - security reporting and disclosure guidance
 - `CHANGES.md` - notable maintenance changes
+- `.github/workflows/check.yml` - hosted no-install map contract validation
 - `Makefile` - local verification entry points
 - `DATASETS.md` - dataset provenance, freshness, and handling notes
 - `geojson` - local infrastructure datasets, stored as GeoJSON or Git LFS pointers
@@ -54,6 +55,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 ## Testing and Verification
 
+- GitHub Actions runs the dependency-free map contracts on Node 20 and Node 24
+  for pushes to `master` and pull requests.
 - Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
 - Run `make build` for the static map validation gate; it uses the same
   dependency-free validator as `make lint`.
@@ -73,6 +76,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   technology and browser language tooling.
 - It also checks that the map container is a labelled region for assistive
   tooling.
+- The validator resolves repository inputs from its own location, so direct
+  invocation from another working directory checks the same map assets.
+- Hosted checks use pinned actions, read-only permissions, and no dependency
+  installation because the validator uses Node built-ins only.
 - It also checks that layer toggles are labelled buttons with `aria-pressed`
   state instead of links that only expose state through CSS.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
@@ -124,6 +131,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   button and `aria-pressed` accessibility coverage.
 - See `docs/plans/2026-06-10-map-region-accessibility.md` for the labelled map
   region guard.
+- See `docs/plans/2026-06-10-hosted-map-validation.md` for root-independent
+  Node 20/24 hosted map contracts.
 
 ## Contributing
 

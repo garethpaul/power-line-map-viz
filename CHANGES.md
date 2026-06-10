@@ -2,6 +2,10 @@
 
 ## 2026-06-10
 
+- Added pinned, read-only hosted map contract validation on Node 20 and Node 24
+  without dependency installation.
+- Made the map validator independent of the caller's working directory and
+  protected the hosted workflow contract locally.
 - Added labelled map-region validation so the primary map container stays
   exposed to assistive tooling.
 

@@ -2,6 +2,10 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
+
+const ROOT = path.resolve(__dirname, '..');
+process.chdir(ROOT);
 
 const errors = [];
 
@@ -29,6 +33,8 @@ const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-acces
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
 const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
+const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
+const workflowPath = '.github/workflows/check.yml';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -47,9 +53,11 @@ exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
 exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
+exists(hostedValidationPlanPath, 'hosted map validation docs plan');
+exists(workflowPath, 'hosted map validation workflow');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -57,6 +65,28 @@ for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPa
   const plan = fs.readFileSync(completedPlanPath, 'utf8');
   if (!/Status: Completed/.test(plan) || !plan.includes('make check')) {
     fail(`${completedPlanPath} must record completed status and make check verification`);
+  }
+}
+
+if (fs.existsSync(workflowPath)) {
+  const workflow = fs.readFileSync(workflowPath, 'utf8');
+  if (!/^permissions:\n  contents: read$/m.test(workflow)) {
+    fail(`${workflowPath} must use read-only repository contents permission`);
+  }
+  if (!workflow.includes('actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10')) {
+    fail(`${workflowPath} must pin the reviewed actions/checkout v6.0.3 commit`);
+  }
+  if (!workflow.includes('actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e')) {
+    fail(`${workflowPath} must pin the reviewed actions/setup-node v6.4.0 commit`);
+  }
+  if (!workflow.includes('node: [20.x, 24.x]')) {
+    fail(`${workflowPath} must cover Node 20 and Node 24`);
+  }
+  if (!/^\s+run: make check$/m.test(workflow)) {
+    fail(`${workflowPath} must run the canonical make check gate`);
+  }
+  if (/\bnpm (?:ci|install)\b/.test(workflow)) {
+    fail(`${workflowPath} must not install dependencies for the built-in-only validator`);
   }
 }
 
