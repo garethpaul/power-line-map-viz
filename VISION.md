@@ -35,6 +35,7 @@ Priority:
 - Keep the no-token warning accessible as a status live region
 - Keep browser zoom available for the static map page
 - Keep the static map page language declared for accessibility tooling
+- Keep the primary map container exposed as a labelled region
 - Keep layer toggles labelled and expose visible/hidden state to assistive
   tooling
 - Make infrastructure data provenance visible

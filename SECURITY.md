@@ -46,6 +46,8 @@ The static page should keep browser zoom enabled; do not add viewport settings
 that disable user scaling or cap maximum zoom at 1.
 The root HTML language should stay declared so assistive technology and browser
 language tooling can interpret the static map page consistently.
+The map container should stay exposed as a labelled region so users can
+identify the primary infrastructure map even when visual rendering fails.
 
 ## Dependency and Supply Chain Security
 

@@ -71,6 +71,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   `width=device-width`.
 - It also checks that the root HTML element declares `lang="en"` for assistive
   technology and browser language tooling.
+- It also checks that the map container is a labelled region for assistive
+  tooling.
 - It also checks that layer toggles are labelled buttons with `aria-pressed`
   state instead of links that only expose state through CSS.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
@@ -120,6 +122,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   language accessibility guard and static `make build` gate.
 - See `docs/plans/2026-06-09-layer-toggle-accessibility.md` for layer menu
   button and `aria-pressed` accessibility coverage.
+- See `docs/plans/2026-06-10-map-region-accessibility.md` for the labelled map
+  region guard.
 
 ## Contributing
 

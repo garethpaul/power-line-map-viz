@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-10
+
+- Added labelled map-region validation so the primary map container stays
+  exposed to assistive tooling.
+
 ## 2026-06-09
 
 - Added layer toggle accessibility validation for labelled buttons and

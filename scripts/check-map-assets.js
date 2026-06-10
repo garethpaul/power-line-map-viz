@@ -28,6 +28,7 @@ const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warni
 const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
+const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -45,9 +46,10 @@ exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs 
 exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
+exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -135,6 +137,19 @@ if (!/<html\b[^>]*\blang=['"]en['"]/i.test(indexHtml)) {
 
 if (!/<nav\b[^>]*\bid=['"]menu['"][^>]*\baria-label=['"]Map layers['"]/i.test(indexHtml)) {
   fail('index.html layer menu nav must expose aria-label="Map layers"');
+}
+
+const mapContainerTag = indexHtml.match(/<div\b[^>]*\bid=['"]map['"][^>]*>/i);
+if (!mapContainerTag) {
+  fail('index.html must include the map container');
+} else {
+  if (!/\brole=['"]region['"]/.test(mapContainerTag[0])) {
+    fail('index.html map container must use role="region"');
+  }
+
+  if (!/\baria-label=['"]Power line infrastructure map['"]/.test(mapContainerTag[0])) {
+    fail('index.html map container must expose a descriptive aria-label');
+  }
 }
 
 const viewportTag = indexHtml.match(/<meta\b[^>]+name=['"]viewport['"][^>]*>/i);
