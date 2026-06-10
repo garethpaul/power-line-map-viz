@@ -34,6 +34,7 @@ const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
 const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
 const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
+const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
 const workflowPath = '.github/workflows/check.yml';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
@@ -54,10 +55,11 @@ exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
 exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
 exists(hostedValidationPlanPath, 'hosted map validation docs plan');
+exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -202,6 +204,15 @@ if (!viewportTag) {
 
 if (!/function\s+showMapTokenWarning\b/.test(script)) {
   fail('map-script.js must expose a browser-visible no-token warning');
+}
+
+if (!/function\s+prefersReducedMotion\b/.test(script) ||
+    !/matchMedia\(['"]\(prefers-reduced-motion:\s*reduce\)['"]\)/.test(script)) {
+  fail('map-script.js must detect the browser reduced-motion preference');
+}
+
+if (!/function\s+enableLineAnimation\b[\s\S]*?if\s*\(prefersReducedMotion\(\)\)\s*\{\s*return;\s*\}/.test(script)) {
+  fail('power-line animation must stay disabled when reduced motion is requested');
 }
 
 if (!/typeof\s+mapboxgl\s*===\s*['"]undefined['"]/.test(script)) {

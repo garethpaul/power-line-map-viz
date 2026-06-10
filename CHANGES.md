@@ -8,6 +8,8 @@
   protected the hosted workflow contract locally.
 - Added labelled map-region validation so the primary map container stays
   exposed to assistive tooling.
+- Added a reduced-motion guard so the power-line layer remains static when the
+  browser requests less animation.
 
 ## 2026-06-09
 

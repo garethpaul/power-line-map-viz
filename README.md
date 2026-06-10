@@ -82,6 +82,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   installation because the validator uses Node built-ins only.
 - It also checks that layer toggles are labelled buttons with `aria-pressed`
   state instead of links that only expose state through CSS.
+- It also checks that the animated power-line layer respects
+  `prefers-reduced-motion: reduce` and remains static for those users.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
@@ -133,6 +135,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   region guard.
 - See `docs/plans/2026-06-10-hosted-map-validation.md` for root-independent
   Node 20/24 hosted map contracts.
+- See `docs/plans/2026-06-10-power-line-reduced-motion.md` for the power-line
+  animation accessibility guard.
 
 ## Contributing
 
