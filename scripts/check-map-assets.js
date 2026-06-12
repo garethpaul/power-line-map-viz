@@ -36,7 +36,9 @@ const ciPlanPath = 'docs/plans/2026-06-10-ci-baseline.md';
 const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
 const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
 const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
+const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
 const workflowPath = '.github/workflows/check.yml';
+const behaviorTestPath = 'scripts/test-map-behavior.js';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -58,10 +60,12 @@ exists(ciPlanPath, 'CI baseline docs plan');
 exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
 exists(hostedValidationPlanPath, 'hosted map validation docs plan');
 exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
+exists(behaviorTestPlanPath, 'map behavior test docs plan');
 exists(workflowPath, 'hosted map validation workflow');
+exists(behaviorTestPath, 'map behavior tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -117,6 +121,11 @@ for (const docsBaselineFile of ['README.md', 'VISION.md', 'SECURITY.md', 'CHANGE
   if (!docsBaseline.includes('GitHub Actions')) {
     fail(`${docsBaselineFile} must document the GitHub Actions baseline`);
   }
+}
+
+const makefile = fs.readFileSync('Makefile', 'utf8').replace(/\r\n/g, '\n');
+if (!/test: lint\n\tnode scripts\/test-map-behavior\.js/.test(makefile)) {
+  fail('Makefile test target must run the dependency-free map behavior tests');
 }
 
 const geojsonReferences = new Set(
@@ -227,6 +236,11 @@ if (!viewportTag) {
 
 if (!/function\s+showMapTokenWarning\b/.test(script)) {
   fail('map-script.js must expose a browser-visible no-token warning');
+}
+
+if (/if\s*\(error\)\s*throw\s+error/.test(script) ||
+    !script.includes('A map marker image could not be loaded.')) {
+  fail('map image failures must show a stable warning instead of throwing raw errors');
 }
 
 if (!/function\s+prefersReducedMotion\b/.test(script) ||

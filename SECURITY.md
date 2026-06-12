@@ -53,6 +53,8 @@ The root HTML language should stay declared so assistive technology and browser
 language tooling can interpret the static map page consistently.
 The map container should stay exposed as a labelled region so users can
 identify the primary infrastructure map even when visual rendering fails.
+Marker-image failures should use a stable browser warning and must not expose
+raw provider or filesystem error details.
 
 ## Dependency and Supply Chain Security
 

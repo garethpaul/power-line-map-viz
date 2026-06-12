@@ -30,6 +30,8 @@ Priority:
 - Run the dependency-free map contracts on Node 22 and Node 24 in hosted CI
   with read-only permissions and pinned actions
 - Keep map validation independent of the caller's working directory
+- Keep dependency-free executable coverage for token warnings, layer toggles,
+  and reduced-motion behavior
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`

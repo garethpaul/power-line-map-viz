@@ -17,6 +17,9 @@
   exposed to assistive tooling.
 - Added a reduced-motion guard so the power-line layer remains static when the
   browser requests less animation.
+- Added dependency-free executable tests for token warnings, layer toggle
+  state, and reduced-motion animation behavior.
+- Replaced unhandled marker-image errors with a stable visible warning.
 
 ## 2026-06-09
 
