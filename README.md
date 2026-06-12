@@ -88,6 +88,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   installation because the validator uses Node built-ins only.
 - It also checks that layer toggles are labelled buttons with `aria-pressed`
   state instead of links that only expose state through CSS.
+- Unavailable marker layers expose disabled, unpressed controls instead of
+  claiming that a layer which failed to load is active.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths
@@ -146,6 +148,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   Node 22/24 hosted map contracts.
 - See `docs/plans/2026-06-10-power-line-reduced-motion.md` for the power-line
   animation accessibility guard.
+- See `docs/plans/2026-06-12-unavailable-layer-controls.md` for disabled control
+  behavior when marker layers fail to load.
 
 ## Contributing
 

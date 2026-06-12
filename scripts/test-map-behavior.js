@@ -43,7 +43,7 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
       this.layers.set(layer.id, layer);
       this.layout.set(layer.id, layer.layout?.visibility || 'visible');
     }
-    getLayer(id) { return this.layers.get(id) || { id }; }
+    getLayer(id) { return this.layers.get(id); }
     getLayoutProperty(id) { return this.layout.get(id) || 'visible'; }
     loadImage(_url, callback) { callback(imageError, {}); }
     on(event, callback) { if (event === 'load') callback(); }
@@ -137,6 +137,12 @@ function main() {
   assert.equal(missingImage.warning.hidden, false);
   assert.match(missingImage.warning.textContent, /map marker image could not be loaded/);
   assert.doesNotMatch(missingImage.warning.textContent, /\/private\/map-assets/);
+  assert.equal(missingImage.menu.children[0].disabled, false);
+  assert.equal(missingImage.menu.children[0].getAttribute('aria-pressed'), 'true');
+  assert.equal(missingImage.menu.children[1].disabled, true);
+  assert.equal(missingImage.menu.children[1].getAttribute('aria-pressed'), 'false');
+  assert.equal(missingImage.menu.children[2].disabled, true);
+  assert.equal(missingImage.menu.children[2].getAttribute('aria-pressed'), 'false');
 
   console.log('Map behavior tests passed.');
 }

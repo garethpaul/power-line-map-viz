@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-12
+
+- Disabled layer controls when marker-image failures prevent their Mapbox
+  layers from loading, with executable accessibility regression coverage.
+
 ## 2026-06-10
 
 - Added a GitHub Actions check workflow that runs the existing Node-backed

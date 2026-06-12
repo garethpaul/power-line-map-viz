@@ -45,6 +45,7 @@ Priority:
 - Keep the primary map container exposed as a labelled region
 - Keep layer toggles labelled and expose visible/hidden state to assistive
   tooling
+- Keep controls for unavailable map layers disabled and accurately unpressed
 - Keep power-line animation disabled when the browser requests reduced motion
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers

@@ -55,6 +55,8 @@ The map container should stay exposed as a labelled region so users can
 identify the primary infrastructure map even when visual rendering fails.
 Marker-image failures should use a stable browser warning and must not expose
 raw provider or filesystem error details.
+Layer controls for failed marker assets stay disabled and unpressed so the UI
+does not claim unavailable infrastructure data is visible.
 
 ## Dependency and Supply Chain Security
 

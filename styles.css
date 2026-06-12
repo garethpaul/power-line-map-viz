@@ -79,6 +79,11 @@ background-color: #333333;
 color: #fefefe;
 }
 
+#menu button:disabled {
+cursor: not-allowed;
+opacity: 0.55;
+}
+
 .mapbox-improve-map {
 display: none;
 }

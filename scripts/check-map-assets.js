@@ -22,6 +22,7 @@ function exists(relativePath, context) {
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
+const readme = fs.readFileSync('README.md', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
@@ -37,6 +38,7 @@ const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessi
 const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
 const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
 const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
+const unavailableLayerPlanPath = 'docs/plans/2026-06-12-unavailable-layer-controls.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
 const datasetInventoryPath = 'DATASETS.md';
@@ -61,11 +63,12 @@ exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
 exists(hostedValidationPlanPath, 'hosted map validation docs plan');
 exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
 exists(behaviorTestPlanPath, 'map behavior test docs plan');
+exists(unavailableLayerPlanPath, 'unavailable layer controls docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -260,8 +263,13 @@ if (!/document\.createElement\(['"]button['"]\)/.test(script)) {
   fail('map-script.js must create button controls for layer toggles');
 }
 
-if (!/link\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) {
-  fail('map-script.js must initialize layer toggles with aria-pressed="true"');
+if (!script.includes("link.disabled = !layerAvailable") ||
+    !script.includes("link.setAttribute('aria-pressed', layerAvailable ? 'true' : 'false')")) {
+  fail('map-script.js must disable unavailable layer toggles and expose their actual pressed state');
+}
+
+if (!readme.includes('Unavailable marker layers expose disabled, unpressed controls')) {
+  fail('README.md must document unavailable marker layer control behavior');
 }
 
 if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]false['"]\)/.test(script)) {
@@ -272,9 +280,19 @@ if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) 
   fail('map-script.js must mark visible layer toggles with aria-pressed="true"');
 }
 
-for (const selector of ['#menu button', '#menu button:last-child', '#menu button:hover', '#menu button.active']) {
+for (const selector of ['#menu button', '#menu button:last-child', '#menu button:hover', '#menu button.active', '#menu button:disabled']) {
   if (!styles.includes(selector)) {
     fail(`styles.css must style layer toggle selector ${selector}`);
+  }
+}
+
+for (const contract of [
+  'getLayer(id) { return this.layers.get(id); }',
+  'assert.equal(missingImage.menu.children[1].disabled, true)',
+  "assert.equal(missingImage.menu.children[1].getAttribute('aria-pressed'), 'false')"
+]) {
+  if (!fs.readFileSync(behaviorTestPath, 'utf8').includes(contract)) {
+    fail(`${behaviorTestPath} must preserve unavailable-layer regression: ${contract}`);
   }
 }
 
