@@ -1,5 +1,15 @@
 # Changes
 
+## 2026-06-10
+
+- Added a GitHub Actions check workflow that runs the existing Node-backed
+  `make check` map asset baseline on pushes, pull requests, and manual
+  dispatches.
+- Added a map asset guard requiring the CI workflow and completed CI baseline
+  plan to remain checked in.
+- Pinned hosted actions and validate the dependency-free map contracts on
+  maintained Node 22 and Node 24 with read-only permissions.
+
 ## 2026-06-09
 
 - Added layer toggle accessibility validation for labelled buttons and

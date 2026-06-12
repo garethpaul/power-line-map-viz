@@ -25,6 +25,8 @@ Priority:
 - Keep layer toggles and power-line animation easy to understand
 - Maintain `make check`, `make verify`, and `make build` as the local map asset
   and data-reference gates
+- Keep GitHub Actions running the Node-backed `make check` baseline before
+  review on maintained Node 22 and Node 24 runtimes
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
@@ -53,6 +55,8 @@ Contribution rules:
 - Do not commit access tokens or private infrastructure data.
 - Keep data refreshes separate from UI changes.
 - Include a screenshot or manual verification note for visual changes.
+- Keep `.github/workflows/check.yml` aligned with the dependency-free map asset
+  validator.
 
 ## Security And Responsible Use
 

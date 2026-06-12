@@ -28,6 +28,8 @@ const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warni
 const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
+const ciPlanPath = 'docs/plans/2026-06-10-ci-baseline.md';
+const ciWorkflowPath = '.github/workflows/check.yml';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -45,9 +47,11 @@ exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs 
 exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
+exists(ciPlanPath, 'CI baseline docs plan');
+exists(ciWorkflowPath, 'GitHub Actions check workflow');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -61,6 +65,49 @@ for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPa
 const datasetInventory = fs.existsSync(datasetInventoryPath)
   ? fs.readFileSync(datasetInventoryPath, 'utf8')
   : '';
+
+if (fs.existsSync(ciWorkflowPath)) {
+  const workflow = fs.readFileSync(ciWorkflowPath, 'utf8').replace(/\r\n/g, '\n');
+  for (const phrase of [
+    'permissions:\n  contents: read',
+    'cancel-in-progress: true',
+    'runs-on: ubuntu-24.04',
+    'timeout-minutes: 10',
+    'node: [22.x, 24.x]',
+    'actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0',
+    'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e',
+    'persist-credentials: false',
+    'run: make check'
+  ]) {
+    if (!workflow.includes(phrase)) {
+      fail(`${ciWorkflowPath} must keep ${phrase}`);
+    }
+  }
+  const expectedActions = [
+    'actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0',
+    'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
+  ];
+  const actions = [...workflow.matchAll(/^\s*(?:-\s*)?uses:\s*(\S+)/gm)].map(match => match[1]);
+  if (JSON.stringify(actions) !== JSON.stringify(expectedActions)) {
+    fail(`${ciWorkflowPath} must use only the approved pinned checkout and setup-node actions`);
+  }
+  if ((workflow.match(/^permissions:/gm) || []).length !== 1 || /^\s+[\w-]+:\s*write\s*$/m.test(workflow)) {
+    fail(`${ciWorkflowPath} must keep one read-only permissions block`);
+  }
+  if ((workflow.match(/persist-credentials: false/g) || []).length !== 1) {
+    fail(`${ciWorkflowPath} must disable persisted checkout credentials exactly once`);
+  }
+  if (/\bnpm (?:ci|install)\b/.test(workflow)) {
+    fail(`${ciWorkflowPath} must keep the built-in-only validator dependency-free`);
+  }
+}
+
+for (const docsBaselineFile of ['README.md', 'VISION.md', 'SECURITY.md', 'CHANGES.md']) {
+  const docsBaseline = fs.readFileSync(docsBaselineFile, 'utf8');
+  if (!docsBaseline.includes('GitHub Actions')) {
+    fail(`${docsBaselineFile} must document the GitHub Actions baseline`);
+  }
+}
 
 const geojsonReferences = new Set(
   Array.from(script.matchAll(/['"](geojson\/[^'"]+\.geojson)['"]/g), match => match[1])

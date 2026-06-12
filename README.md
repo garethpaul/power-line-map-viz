@@ -57,6 +57,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
 - Run `make build` for the static map validation gate; it uses the same
   dependency-free validator as `make lint`.
+- GitHub Actions runs `make check` through `.github/workflows/check.yml` on
+  pushes, pull requests, and manual dispatches using Node 22 and Node 24.
 - The verification gate checks local script/style references, marker and
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
@@ -120,6 +122,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
   language accessibility guard and static `make build` gate.
 - See `docs/plans/2026-06-09-layer-toggle-accessibility.md` for layer menu
   button and `aria-pressed` accessibility coverage.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 
 ## Contributing
 
