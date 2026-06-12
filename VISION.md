@@ -37,6 +37,7 @@ Priority:
 - Keep completed maintenance plans under `docs/plans`
 - Keep the browser page title aligned with the Power Line Map purpose
 - Keep intentional remote browser assets allowlisted and explicit
+- Bind pinned Mapbox JavaScript and CSS to reviewed Subresource Integrity hashes
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Keep the no-token warning accessible as a status live region
