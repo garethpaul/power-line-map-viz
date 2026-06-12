@@ -32,6 +32,8 @@
 - `scripts/test-map-behavior.js` executes token-warning, layer-toggle, and reduced-motion behavior without network access.
 - Start with the narrowest relevant test or Make target, then run `make check` before handing off if the change is not documentation-only.
 - Keep README verification notes in sync when commands, fixtures, or supported toolchains change.
+- Update Mapbox CDN URLs, SHA-384 integrity values, and checker contracts
+  together after verifying the official response bytes and CORS headers.
 
 ## PR / change guidance
 
@@ -44,6 +46,8 @@
 
 - Detected references to Mapbox. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
 - `make check` allowlists the browser's remote script/style assets so additional external dependencies cannot be added silently.
+- See `docs/plans/2026-06-12-mapbox-subresource-integrity.md` for the remote
+  Mapbox byte-integrity boundary and refresh procedure.
 - `make check` keeps the no-token Mapbox warning accessible with a status live region.
 - `make check` keeps browser zoom enabled by rejecting viewport settings that disable user scaling or cap maximum zoom at 1.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.

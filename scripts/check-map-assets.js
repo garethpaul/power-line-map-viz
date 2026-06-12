@@ -39,12 +39,23 @@ const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md
 const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
 const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
 const unavailableLayerPlanPath = 'docs/plans/2026-06-12-unavailable-layer-controls.md';
+const mapboxIntegrityPlanPath = 'docs/plans/2026-06-12-mapbox-subresource-integrity.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
+const mapboxIntegrityTestPath = 'scripts/test-mapbox-integrity.js';
 const datasetInventoryPath = 'DATASETS.md';
+const mapboxIntegrity = new Map([
+  [
+    'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
+    'sha384-Xl0CAgGkuwxYbsGqIVjAkd+dCJwYigLOy0OMNVQPJxTrRRuHJYBd1ePj727mUry5'
+  ],
+  [
+    'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css',
+    'sha384-vL3ZAw2ReQIdxrwUqRWv0tBphVsMAJRrOLGU/rYaA1hnRjv8oBvlEywnbosRbPXG'
+  ]
+]);
 const allowedRemoteAssets = new Set([
-  'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
-  'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css',
+  ...mapboxIntegrity.keys(),
   'https://fonts.googleapis.com/css?family=Roboto&display=swap'
 ]);
 
@@ -64,11 +75,13 @@ exists(hostedValidationPlanPath, 'hosted map validation docs plan');
 exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
 exists(behaviorTestPlanPath, 'map behavior test docs plan');
 exists(unavailableLayerPlanPath, 'unavailable layer controls docs plan');
+exists(mapboxIntegrityPlanPath, 'Mapbox subresource integrity docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
+exists(mapboxIntegrityTestPath, 'Mapbox integrity mutation tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, mapboxIntegrityPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -155,10 +168,15 @@ for (const term of ['Source status: unknown', 'refresh date', 'private infrastru
 }
 
 const remoteAssets = new Set();
-for (const match of indexHtml.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=['"]([^'"]+)['"]/g)) {
+const remoteTags = new Map();
+for (const match of indexHtml.matchAll(/<(?:script|link)\b[^>]*\s(?:src|href)\s*=\s*['"]([^'"]+)['"][^>]*>/gi)) {
+  const tag = match[0];
   const reference = match[1];
   if (reference.startsWith('http://') || reference.startsWith('https://')) {
     remoteAssets.add(reference);
+    const tags = remoteTags.get(reference) || [];
+    tags.push(tag);
+    remoteTags.set(reference, tags);
     if (!allowedRemoteAssets.has(reference)) {
       fail(`index.html references unapproved remote asset: ${reference}`);
     }
@@ -171,6 +189,60 @@ for (const expectedRemoteAsset of allowedRemoteAssets) {
   if (!remoteAssets.has(expectedRemoteAsset)) {
     fail(`index.html must keep approved remote asset: ${expectedRemoteAsset}`);
   }
+}
+
+for (const [url, expectedIntegrity] of mapboxIntegrity) {
+  const tags = remoteTags.get(url) || [];
+  if (tags.length !== 1) {
+    fail(`index.html must include exactly one Mapbox asset tag for ${url}`);
+    continue;
+  }
+
+  const tag = tags[0];
+  const integrityAttributes = tag.match(/\sintegrity\s*=/gi) || [];
+  const crossoriginAttributes = tag.match(/\scrossorigin\s*=/gi) || [];
+  const integrity = tag.match(/\sintegrity\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+  const crossorigin = tag.match(/\scrossorigin\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+
+  if (integrityAttributes.length !== 1 || integrity !== expectedIntegrity) {
+    fail(`index.html must keep the reviewed Mapbox integrity for ${url}`);
+  }
+  if (crossoriginAttributes.length !== 1 || crossorigin !== 'anonymous') {
+    fail(`index.html must use crossorigin="anonymous" for ${url}`);
+  }
+}
+
+const checkerSource = fs.readFileSync(__filename, 'utf8');
+for (const contract of [
+  'for (const [url, expectedIntegrity] of mapboxIntegrity)',
+  'integrityAttributes.length !== 1',
+  "crossorigin !== 'anonymous'"
+]) {
+  const occurrences = checkerSource.split(contract).length - 1;
+  if (occurrences !== 2) {
+    fail(`Mapbox integrity checker must preserve: ${contract}`);
+  }
+}
+
+if (fs.existsSync(mapboxIntegrityTestPath)) {
+  const integrityTest = fs.readFileSync(mapboxIntegrityTestPath, 'utf8');
+  for (const contract of [
+    'missing JavaScript integrity',
+    'swapped Mapbox integrity',
+    'duplicate integrity attribute',
+    'duplicate Mapbox tag',
+    'missing Mapbox crossorigin',
+    'stale Mapbox URL',
+    'removed SRI enforcement'
+  ]) {
+    if (!integrityTest.includes(contract)) {
+      fail(`Mapbox integrity mutation tests must preserve: ${contract}`);
+    }
+  }
+}
+
+if (!makefile.includes('node scripts/test-mapbox-integrity.js')) {
+  fail('Makefile test gate must run Mapbox integrity mutation tests');
 }
 
 if (/mapboxgl\.accessToken\s*=\s*['"][^'"]+['"]/.test(script)) {

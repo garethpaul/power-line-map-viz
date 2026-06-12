@@ -41,6 +41,10 @@ The browser page intentionally loads Mapbox GL JS/CSS and Google Fonts from
 fixed remote URLs. Run `make check` before changing `index.html`; it rejects
 new remote script or stylesheet references unless they are explicitly
 allowlisted.
+The two Mapbox resources are additionally bound to reviewed SHA-384
+Subresource Integrity values with anonymous cross-origin mode. An intentional
+Mapbox update must verify the official CDN bytes and update the HTML and static
+checker contracts together.
 
 The no-token Mapbox warning should remain an accessible status live region so
 users are told why the local map is not rendering instead of seeing a silent
