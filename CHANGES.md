@@ -1,8 +1,20 @@
 # Changes
 
+## 2026-06-12
+
+- Disabled layer controls when marker-image failures prevent their Mapbox
+  layers from loading, with executable accessibility regression coverage.
+
 ## 2026-06-10
 
-- Added pinned, read-only hosted map contract validation on Node 20 and Node 24
+- Added a GitHub Actions check workflow that runs the existing Node-backed
+  `make check` map asset baseline on pushes, pull requests, and manual
+  dispatches.
+- Added a map asset guard requiring the CI workflow and completed CI baseline
+  plan to remain checked in.
+- Pinned hosted actions and validate the dependency-free map contracts on
+  maintained Node 22 and Node 24 with read-only permissions.
+- Added pinned, read-only hosted map contract validation on Node 22 and Node 24
   without dependency installation.
 - Made the map validator independent of the caller's working directory and
   protected the hosted workflow contract locally.
@@ -10,6 +22,9 @@
   exposed to assistive tooling.
 - Added a reduced-motion guard so the power-line layer remains static when the
   browser requests less animation.
+- Added dependency-free executable tests for token warnings, layer toggle
+  state, and reduced-motion animation behavior.
+- Replaced unhandled marker-image errors with a stable visible warning.
 
 ## 2026-06-09
 
