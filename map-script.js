@@ -62,6 +62,12 @@ function setupLayerToggles(map) {
     }
 }
 
+function prefersReducedMotion() {
+    return typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function initializeMap() {
     mapboxgl.accessToken = mapboxAccessToken;
 
@@ -76,6 +82,10 @@ function initializeMap() {
     // Setup a line animation for the power to run through e.g. like a strobe..
     var animationStep = 30;
     function enableLineAnimation(layerId) {
+        if (prefersReducedMotion()) {
+            return;
+        }
+
         var step = 0;
         var dashArraySeq = [
             [0, 4, 3],

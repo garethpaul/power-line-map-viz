@@ -9,6 +9,14 @@
   plan to remain checked in.
 - Pinned hosted actions and validate the dependency-free map contracts on
   maintained Node 22 and Node 24 with read-only permissions.
+- Added pinned, read-only hosted map contract validation on Node 22 and Node 24
+  without dependency installation.
+- Made the map validator independent of the caller's working directory and
+  protected the hosted workflow contract locally.
+- Added labelled map-region validation so the primary map container stays
+  exposed to assistive tooling.
+- Added a reduced-motion guard so the power-line layer remains static when the
+  browser requests less animation.
 
 ## 2026-06-09
 

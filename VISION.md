@@ -27,6 +27,9 @@ Priority:
   and data-reference gates
 - Keep GitHub Actions running the Node-backed `make check` baseline before
   review on maintained Node 22 and Node 24 runtimes
+- Run the dependency-free map contracts on Node 22 and Node 24 in hosted CI
+  with read-only permissions and pinned actions
+- Keep map validation independent of the caller's working directory
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
@@ -37,8 +40,10 @@ Priority:
 - Keep the no-token warning accessible as a status live region
 - Keep browser zoom available for the static map page
 - Keep the static map page language declared for accessibility tooling
+- Keep the primary map container exposed as a labelled region
 - Keep layer toggles labelled and expose visible/hidden state to assistive
   tooling
+- Keep power-line animation disabled when the browser requests reduced motion
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 

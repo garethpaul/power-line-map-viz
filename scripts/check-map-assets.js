@@ -2,6 +2,10 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
+
+const ROOT = path.resolve(__dirname, '..');
+process.chdir(ROOT);
 
 const errors = [];
 
@@ -29,7 +33,10 @@ const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-acces
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
 const ciPlanPath = 'docs/plans/2026-06-10-ci-baseline.md';
-const ciWorkflowPath = '.github/workflows/check.yml';
+const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
+const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
+const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
+const workflowPath = '.github/workflows/check.yml';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -48,10 +55,13 @@ exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
 exists(ciPlanPath, 'CI baseline docs plan');
-exists(ciWorkflowPath, 'GitHub Actions check workflow');
+exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
+exists(hostedValidationPlanPath, 'hosted map validation docs plan');
+exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
+exists(workflowPath, 'hosted map validation workflow');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -66,8 +76,8 @@ const datasetInventory = fs.existsSync(datasetInventoryPath)
   ? fs.readFileSync(datasetInventoryPath, 'utf8')
   : '';
 
-if (fs.existsSync(ciWorkflowPath)) {
-  const workflow = fs.readFileSync(ciWorkflowPath, 'utf8').replace(/\r\n/g, '\n');
+if (fs.existsSync(workflowPath)) {
+  const workflow = fs.readFileSync(workflowPath, 'utf8').replace(/\r\n/g, '\n');
   for (const phrase of [
     'permissions:\n  contents: read',
     'cancel-in-progress: true',
@@ -80,7 +90,7 @@ if (fs.existsSync(ciWorkflowPath)) {
     'run: make check'
   ]) {
     if (!workflow.includes(phrase)) {
-      fail(`${ciWorkflowPath} must keep ${phrase}`);
+      fail(`${workflowPath} must keep ${phrase}`);
     }
   }
   const expectedActions = [
@@ -89,16 +99,16 @@ if (fs.existsSync(ciWorkflowPath)) {
   ];
   const actions = [...workflow.matchAll(/^\s*(?:-\s*)?uses:\s*(\S+)/gm)].map(match => match[1]);
   if (JSON.stringify(actions) !== JSON.stringify(expectedActions)) {
-    fail(`${ciWorkflowPath} must use only the approved pinned checkout and setup-node actions`);
+    fail(`${workflowPath} must use only the approved pinned checkout and setup-node actions`);
   }
   if ((workflow.match(/^permissions:/gm) || []).length !== 1 || /^\s+[\w-]+:\s*write\s*$/m.test(workflow)) {
-    fail(`${ciWorkflowPath} must keep one read-only permissions block`);
+    fail(`${workflowPath} must keep one read-only permissions block`);
   }
   if ((workflow.match(/persist-credentials: false/g) || []).length !== 1) {
-    fail(`${ciWorkflowPath} must disable persisted checkout credentials exactly once`);
+    fail(`${workflowPath} must disable persisted checkout credentials exactly once`);
   }
   if (/\bnpm (?:ci|install)\b/.test(workflow)) {
-    fail(`${ciWorkflowPath} must keep the built-in-only validator dependency-free`);
+    fail(`${workflowPath} must keep the built-in-only validator dependency-free`);
   }
 }
 
@@ -184,6 +194,19 @@ if (!/<nav\b[^>]*\bid=['"]menu['"][^>]*\baria-label=['"]Map layers['"]/i.test(in
   fail('index.html layer menu nav must expose aria-label="Map layers"');
 }
 
+const mapContainerTag = indexHtml.match(/<div\b[^>]*\bid=['"]map['"][^>]*>/i);
+if (!mapContainerTag) {
+  fail('index.html must include the map container');
+} else {
+  if (!/\brole=['"]region['"]/.test(mapContainerTag[0])) {
+    fail('index.html map container must use role="region"');
+  }
+
+  if (!/\baria-label=['"]Power line infrastructure map['"]/.test(mapContainerTag[0])) {
+    fail('index.html map container must expose a descriptive aria-label');
+  }
+}
+
 const viewportTag = indexHtml.match(/<meta\b[^>]+name=['"]viewport['"][^>]*>/i);
 if (!viewportTag) {
   fail('index.html must include a viewport meta tag');
@@ -204,6 +227,15 @@ if (!viewportTag) {
 
 if (!/function\s+showMapTokenWarning\b/.test(script)) {
   fail('map-script.js must expose a browser-visible no-token warning');
+}
+
+if (!/function\s+prefersReducedMotion\b/.test(script) ||
+    !/matchMedia\(['"]\(prefers-reduced-motion:\s*reduce\)['"]\)/.test(script)) {
+  fail('map-script.js must detect the browser reduced-motion preference');
+}
+
+if (!/function\s+enableLineAnimation\b[\s\S]*?if\s*\(prefersReducedMotion\(\)\)\s*\{\s*return;\s*\}/.test(script)) {
+  fail('power-line animation must stay disabled when reduced motion is requested');
 }
 
 if (!/typeof\s+mapboxgl\s*===\s*['"]undefined['"]/.test(script)) {
