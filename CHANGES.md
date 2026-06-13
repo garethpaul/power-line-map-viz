@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Synchronized delayed marker-layer success with existing disabled controls
+  while preserving failure-disabled state.
 - Synchronized each layer control's initial active and pressed state with the
   layer's actual Mapbox layout visibility.
 - Added dependency-free RFC 7946 structural validation for hydrated GeoJSON

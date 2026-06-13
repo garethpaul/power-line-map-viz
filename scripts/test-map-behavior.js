@@ -22,10 +22,11 @@ function createButton() {
   };
 }
 
-function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
+function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
   const warning = { hidden: true, textContent: '' };
   const menu = { hidden: true, children: [], appendChild(child) { this.children.push(child); } };
   const intervals = [];
+  const imageCallbacks = [];
   const maps = [];
 
   class MapStub {
@@ -45,7 +46,13 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
     }
     getLayer(id) { return this.layers.get(id); }
     getLayoutProperty(id) { return this.layout.get(id) || 'visible'; }
-    loadImage(_url, callback) { callback(imageError, {}); }
+    loadImage(_url, callback) {
+      if (deferImages) {
+        imageCallbacks.push(callback);
+        return;
+      }
+      callback(imageError, {});
+    }
     on(event, callback) { if (event === 'load') callback(); }
     setLayoutProperty(id, _property, value) { this.layout.set(id, value); }
     setPaintProperty(id, property, value) { this.paintChanges.push({ id, property, value }); }
@@ -78,7 +85,7 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
   }
 
   vm.runInNewContext(MAP_SCRIPT, sandbox, { filename: 'map-script.js' });
-  return { intervals, maps, menu, sandbox, warning };
+  return { imageCallbacks, intervals, maps, menu, sandbox, warning };
 }
 
 function click(button) {
@@ -147,6 +154,21 @@ function main() {
   assert.equal(animated.maps.length, 1);
   assert.equal(animated.intervals.length, 1);
   assert.equal(animated.intervals[0].delay, 30);
+
+  const delayedImages = loadMapScript({ deferImages: true });
+  delayedImages.sandbox.mapboxAccessToken = 'test-token';
+  delayedImages.sandbox.initializeMap();
+  assert.equal(delayedImages.imageCallbacks.length, 2);
+  assert.equal(delayedImages.menu.children[1].disabled, true);
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  delayedImages.imageCallbacks[0](null, {});
+  assert.equal(delayedImages.menu.children[1].disabled, false);
+  assert.equal(delayedImages.menu.children[1].className, 'active');
+  assert.equal(delayedImages.menu.children[1].getAttribute('aria-pressed'), 'true');
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  delayedImages.imageCallbacks[1](new Error('/private/map-assets/cell-towers.png'));
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  assert.equal(delayedImages.menu.children[2].getAttribute('aria-pressed'), 'false');
 
   const missingImage = loadMapScript({ imageError: new Error('/private/map-assets/power-stations.png') });
   missingImage.sandbox.mapboxAccessToken = 'test-token';

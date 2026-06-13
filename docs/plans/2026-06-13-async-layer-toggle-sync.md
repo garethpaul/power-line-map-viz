@@ -1,6 +1,6 @@
 # Synchronize Asynchronous Layer Toggle Availability
 
-Status: Pending
+Status: Completed
 
 ## Context
 
@@ -38,8 +38,22 @@ the corresponding marker layer loads successfully.
 
 ## Work Completed
 
-Pending implementation.
+- Extracted reusable layer-control state synchronization for availability,
+  active styling, and `aria-pressed` state.
+- Resynchronized only the matching station or tower control after its
+  asynchronous `map.addLayer` succeeds.
+- Added deferred image callbacks to the browser harness and protected success,
+  sibling-failure, documentation, and plan contracts in the static checker.
 
 ## Verification Results
 
-Pending implementation and validation.
+- JavaScript syntax and focused browser behavior tests passed.
+- Node 22 and Node 24 `make check` passed in network-disabled, read-only
+  containers against disposable writable repository copies.
+- Nine hostile mutations rejected missing success synchronization, failure
+  ordering changes, disabled-state drift, missing delayed tests, documentation
+  drift, plan status drift, and verification-evidence drift.
+- Exact-base comparison confirmed GeoJSON, images, HTML, styles, workflow,
+  Makefile, and dataset inventory were unchanged.
+- `git diff --check` plus secret, captured-prompt, and generated-artifact scans
+  passed; no dependency or remote-asset references changed.

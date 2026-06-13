@@ -91,6 +91,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   state instead of links that only expose state through CSS.
 - Unavailable marker layers expose disabled, unpressed controls instead of
   claiming that a layer which failed to load is active.
+- Successfully loaded marker layers enable their existing controls after the
+  asynchronous image callback adds the layer; failed siblings remain disabled.
 - Available layers configured as initially hidden expose inactive, unpressed
   controls until the user shows them.
 - It also checks that the animated power-line layer respects
@@ -155,6 +157,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   animation accessibility guard.
 - See `docs/plans/2026-06-12-unavailable-layer-controls.md` for disabled control
   behavior when marker layers fail to load.
+- See `docs/plans/2026-06-13-async-layer-toggle-sync.md` for delayed marker
+  success and failure control synchronization.
 
 ## Contributing
 

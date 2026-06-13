@@ -11,6 +11,32 @@ function showMapTokenWarning(message) {
     warning.hidden = false;
 }
 
+function syncLayerToggleState(map, button) {
+    var layerId = button.dataset.layerId;
+    var layerAvailable = Boolean(map.getLayer(layerId));
+    var layerVisible = layerAvailable &&
+        map.getLayoutProperty(layerId, 'visibility') !== 'none';
+
+    button.disabled = !layerAvailable;
+    button.className = layerVisible ? 'active' : '';
+    button.setAttribute('aria-pressed', layerVisible ? 'true' : 'false');
+}
+
+function syncLayerToggle(map, layerId) {
+    var layers = document.getElementById('menu');
+
+    if (!layers) {
+        return;
+    }
+
+    for (var i = 0; i < layers.children.length; i++) {
+        if (layers.children[i].dataset.layerId === layerId) {
+            syncLayerToggleState(map, layers.children[i]);
+            return;
+        }
+    }
+}
+
 function setupLayerToggles(map) {
     var toggleableLayerIds = [
         {'id': 'power_lines', 'name': "Power Lines"},
@@ -27,15 +53,10 @@ function setupLayerToggles(map) {
 
     for (var i = 0; i < toggleableLayerIds.length; i++) {
         var link = document.createElement('button');
-        var layerAvailable = Boolean(map.getLayer(toggleableLayerIds[i]['id']));
-        var layerVisible = layerAvailable &&
-            map.getLayoutProperty(toggleableLayerIds[i]['id'], 'visibility') !== 'none';
         link.type = 'button';
-        link.className = layerVisible ? 'active' : '';
         link.textContent = toggleableLayerIds[i]['name'];
         link.dataset.layerId = toggleableLayerIds[i]['id'];
-        link.disabled = !layerAvailable;
-        link.setAttribute('aria-pressed', layerVisible ? 'true' : 'false');
+        syncLayerToggleState(map, link);
 
         // Handle clicks on the layer toggle button.
         link.onclick = function (e) {
@@ -131,6 +152,7 @@ function initializeMap() {
                 "icon-size": 0.5 //this is a multiplier applied to the standard size. So if you want it half the size put ".5"
             }
             });
+            syncLayerToggle(map, 'power_stations');
         });
 
         // Load Cell Towers
@@ -154,6 +176,7 @@ function initializeMap() {
                 "icon-size": 0.5 //this is a multiplier applied to the standard size. So if you want it half the size put ".5"
             }
             });
+            syncLayerToggle(map, 'cell_towers');
         });
 
 
