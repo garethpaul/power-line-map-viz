@@ -1,6 +1,6 @@
 # Initial Layer Toggle Visibility
 
-Status: Planned
+Status: Completed
 
 ## Problem
 
@@ -28,6 +28,21 @@ misstates both the map and control state until the first click.
 - Keep the controls as native buttons with synchronized active class and
   `aria-pressed` state.
 
+## Work Completed
+
+- Derived each available control's initial state from the Mapbox layer's
+  current layout visibility while preserving default-visible behavior.
+- Kept unavailable controls disabled and unpressed without querying a missing
+  layer's layout.
+- Added executable coverage for an initially hidden layer becoming visible on
+  click and static contracts for the runtime and assertion boundaries.
+- Updated maintenance and behavior documentation.
+
 ## Verification
 
-Pending implementation.
+- `make check` passed the complete static asset, hydrated GeoJSON, and
+  executable map behavior gate on Node 22.22.2 and Node 24.16.0.
+- Four temporary hostile mutations were rejected: inverted visibility,
+  availability-only active styling, removed hidden-state assertions, and a
+  regressed plan completion status.
+- `git diff --check` passed for the completed implementation.

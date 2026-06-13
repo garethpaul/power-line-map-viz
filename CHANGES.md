@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Synchronized each layer control's initial active and pressed state with the
+  layer's actual Mapbox layout visibility.
 - Added dependency-free RFC 7946 structural validation for hydrated GeoJSON
   features, supported geometries, finite positions, coordinate nesting, and
   polygon ring closure while preserving valid Git LFS pointers.

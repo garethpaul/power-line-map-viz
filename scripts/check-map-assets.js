@@ -179,6 +179,7 @@ const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.m
 const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
 const unavailableLayerPlanPath = 'docs/plans/2026-06-12-unavailable-layer-controls.md';
 const hydratedGeojsonPlanPath = 'docs/plans/2026-06-13-hydrated-geojson-validation.md';
+const initialLayerVisibilityPlanPath = 'docs/plans/2026-06-13-initial-layer-toggle-visibility.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
 const geojsonTestPath = 'scripts/test-geojson-validation.js';
@@ -206,12 +207,13 @@ exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
 exists(behaviorTestPlanPath, 'map behavior test docs plan');
 exists(unavailableLayerPlanPath, 'unavailable layer controls docs plan');
 exists(hydratedGeojsonPlanPath, 'hydrated GeoJSON validation docs plan');
+exists(initialLayerVisibilityPlanPath, 'initial layer visibility docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
 exists(geojsonTestPath, 'hydrated GeoJSON validation tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath, initialLayerVisibilityPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -407,8 +409,10 @@ if (!/document\.createElement\(['"]button['"]\)/.test(script)) {
   fail('map-script.js must create button controls for layer toggles');
 }
 
-if (!script.includes("link.disabled = !layerAvailable") ||
-    !script.includes("link.setAttribute('aria-pressed', layerAvailable ? 'true' : 'false')")) {
+if (!script.includes("map.getLayoutProperty(toggleableLayerIds[i]['id'], 'visibility') !== 'none'") ||
+    !script.includes("link.className = layerVisible ? 'active' : ''") ||
+    !script.includes("link.disabled = !layerAvailable") ||
+    !script.includes("link.setAttribute('aria-pressed', layerVisible ? 'true' : 'false')")) {
   fail('map-script.js must disable unavailable layer toggles and expose their actual pressed state');
 }
 
@@ -433,10 +437,13 @@ for (const selector of ['#menu button', '#menu button:last-child', '#menu button
 for (const contract of [
   'getLayer(id) { return this.layers.get(id); }',
   'assert.equal(missingImage.menu.children[1].disabled, true)',
-  "assert.equal(missingImage.menu.children[1].getAttribute('aria-pressed'), 'false')"
+  "assert.equal(missingImage.menu.children[1].getAttribute('aria-pressed'), 'false')",
+  "assert.equal(missingToken.menu.children[0].className, '')",
+  "assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false')",
+  "assert.equal(initiallyHiddenMap.visibility, 'visible')"
 ]) {
   if (!fs.readFileSync(behaviorTestPath, 'utf8').includes(contract)) {
-    fail(`${behaviorTestPath} must preserve unavailable-layer regression: ${contract}`);
+    fail(`${behaviorTestPath} must preserve layer-control state regression: ${contract}`);
   }
 }
 
