@@ -28,12 +28,14 @@ function setupLayerToggles(map) {
     for (var i = 0; i < toggleableLayerIds.length; i++) {
         var link = document.createElement('button');
         var layerAvailable = Boolean(map.getLayer(toggleableLayerIds[i]['id']));
+        var layerVisible = layerAvailable &&
+            map.getLayoutProperty(toggleableLayerIds[i]['id'], 'visibility') !== 'none';
         link.type = 'button';
-        link.className = layerAvailable ? 'active' : '';
+        link.className = layerVisible ? 'active' : '';
         link.textContent = toggleableLayerIds[i]['name'];
         link.dataset.layerId = toggleableLayerIds[i]['id'];
         link.disabled = !layerAvailable;
-        link.setAttribute('aria-pressed', layerAvailable ? 'true' : 'false');
+        link.setAttribute('aria-pressed', layerVisible ? 'true' : 'false');
 
         // Handle clicks on the layer toggle button.
         link.onclick = function (e) {

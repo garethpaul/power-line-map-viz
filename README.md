@@ -91,6 +91,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   state instead of links that only expose state through CSS.
 - Unavailable marker layers expose disabled, unpressed controls instead of
   claiming that a layer which failed to load is active.
+- Available layers configured as initially hidden expose inactive, unpressed
+  controls until the user shows them.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths

@@ -103,6 +103,23 @@ function main() {
   assert.equal(missingToken.menu.hidden, false);
   assert.equal(missingToken.menu.children.length, 3);
   assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+
+  const initiallyHiddenMap = {
+    visibility: 'none',
+    getLayer() { return true; },
+    getLayoutProperty() { return this.visibility; },
+    setLayoutProperty(_id, _property, value) { this.visibility = value; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(initiallyHiddenMap);
+  assert.equal(missingToken.menu.children[0].disabled, false);
+  assert.equal(missingToken.menu.children[0].className, '');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+  click(missingToken.menu.children[0]);
+  assert.equal(initiallyHiddenMap.visibility, 'visible');
+  assert.equal(missingToken.menu.children[0].className, 'active');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+
   const toggleMap = {
     visibility: 'visible',
     getLayer() { return true; },
