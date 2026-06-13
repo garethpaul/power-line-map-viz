@@ -22,6 +22,8 @@ The current focus is:
 Priority:
 
 - Preserve the local GeoJSON layer structure
+- Validate hydrated GeoJSON features, geometries, finite positions, coordinate
+  nesting, and polygon ring closure while preserving Git LFS pointer checkouts
 - Keep layer toggles and power-line animation easy to understand
 - Maintain `make check`, `make verify`, and `make build` as the local map asset
   and data-reference gates

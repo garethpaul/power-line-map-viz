@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -17,6 +16,146 @@ function exists(relativePath, context) {
   if (!fs.existsSync(relativePath)) {
     fail(`${context} references missing file: ${relativePath}`);
   }
+}
+
+function isObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function validatePosition(value, valuePath, validationErrors) {
+  if (!Array.isArray(value) || value.length < 2) {
+    validationErrors.push(`${valuePath} must be a position with at least two numbers`);
+    return;
+  }
+
+  value.forEach((coordinate, index) => {
+    if (typeof coordinate !== 'number' || !Number.isFinite(coordinate)) {
+      validationErrors.push(`${valuePath}[${index}] must be a finite number`);
+    }
+  });
+}
+
+function validatePositionArray(value, valuePath, validationErrors, minimumLength) {
+  if (!Array.isArray(value)) {
+    validationErrors.push(`${valuePath} must be an array of positions`);
+    return;
+  }
+
+  if (minimumLength && value.length < minimumLength) {
+    validationErrors.push(`${valuePath} must contain at least ${minimumLength} positions`);
+  }
+
+  value.forEach((position, index) => {
+    validatePosition(position, `${valuePath}[${index}]`, validationErrors);
+  });
+}
+
+function positionsMatch(first, last) {
+  return Array.isArray(first)
+    && Array.isArray(last)
+    && first.length === last.length
+    && first.every((coordinate, index) => coordinate === last[index]);
+}
+
+function validateLinearRing(value, valuePath, validationErrors) {
+  validatePositionArray(value, valuePath, validationErrors, 4);
+  if (Array.isArray(value) && value.length >= 4 && !positionsMatch(value[0], value[value.length - 1])) {
+    validationErrors.push(`${valuePath} must be closed with matching first and last positions`);
+  }
+}
+
+function validateGeometry(geometry, geometryPath, validationErrors) {
+  if (!isObject(geometry)) {
+    validationErrors.push(`${geometryPath} must be a GeoJSON geometry object or null`);
+    return;
+  }
+
+  switch (geometry.type) {
+    case 'Point':
+      validatePosition(geometry.coordinates, `${geometryPath}.coordinates`, validationErrors);
+      break;
+    case 'MultiPoint':
+      validatePositionArray(geometry.coordinates, `${geometryPath}.coordinates`, validationErrors);
+      break;
+    case 'LineString':
+      validatePositionArray(geometry.coordinates, `${geometryPath}.coordinates`, validationErrors, 2);
+      break;
+    case 'MultiLineString':
+      if (!Array.isArray(geometry.coordinates)) {
+        validationErrors.push(`${geometryPath}.coordinates must be an array of LineStrings`);
+        break;
+      }
+      geometry.coordinates.forEach((line, index) => {
+        validatePositionArray(line, `${geometryPath}.coordinates[${index}]`, validationErrors, 2);
+      });
+      break;
+    case 'Polygon':
+      if (!Array.isArray(geometry.coordinates)) {
+        validationErrors.push(`${geometryPath}.coordinates must be an array of linear rings`);
+        break;
+      }
+      geometry.coordinates.forEach((ring, index) => {
+        validateLinearRing(ring, `${geometryPath}.coordinates[${index}]`, validationErrors);
+      });
+      break;
+    case 'MultiPolygon':
+      if (!Array.isArray(geometry.coordinates)) {
+        validationErrors.push(`${geometryPath}.coordinates must be an array of Polygons`);
+        break;
+      }
+      geometry.coordinates.forEach((polygon, polygonIndex) => {
+        if (!Array.isArray(polygon)) {
+          validationErrors.push(`${geometryPath}.coordinates[${polygonIndex}] must be an array of linear rings`);
+          return;
+        }
+        polygon.forEach((ring, ringIndex) => {
+          validateLinearRing(ring, `${geometryPath}.coordinates[${polygonIndex}][${ringIndex}]`, validationErrors);
+        });
+      });
+      break;
+    case 'GeometryCollection':
+      if (!Array.isArray(geometry.geometries)) {
+        validationErrors.push(`${geometryPath}.geometries must be an array of geometry objects`);
+        break;
+      }
+      geometry.geometries.forEach((member, index) => {
+        validateGeometry(member, `${geometryPath}.geometries[${index}]`, validationErrors);
+      });
+      break;
+    default:
+      validationErrors.push(`${geometryPath}.type is unsupported: ${String(geometry.type)}`);
+  }
+}
+
+function validateFeatureCollection(value, relativePath) {
+  const validationErrors = [];
+  if (!isObject(value) || value.type !== 'FeatureCollection') {
+    return [`${relativePath} must be a GeoJSON FeatureCollection`];
+  }
+  if (!Array.isArray(value.features)) {
+    return [`${relativePath}.features must be an array`];
+  }
+
+  value.features.forEach((feature, index) => {
+    const featurePath = `${relativePath}.features[${index}]`;
+    if (!isObject(feature) || feature.type !== 'Feature') {
+      validationErrors.push(`${featurePath} must be a GeoJSON Feature object`);
+      return;
+    }
+    const validId = typeof feature.id === 'string'
+      || (typeof feature.id === 'number' && Number.isFinite(feature.id));
+    if (feature.id !== undefined && !validId) {
+      validationErrors.push(`${featurePath}.id must be a string or number`);
+    }
+    if (feature.properties !== null && !isObject(feature.properties)) {
+      validationErrors.push(`${featurePath}.properties must be an object or null`);
+    }
+    if (feature.geometry !== null) {
+      validateGeometry(feature.geometry, `${featurePath}.geometry`, validationErrors);
+    }
+  });
+
+  return validationErrors;
 }
 
 const indexHtml = fs.readFileSync('index.html', 'utf8');
@@ -39,8 +178,10 @@ const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md
 const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
 const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
 const unavailableLayerPlanPath = 'docs/plans/2026-06-12-unavailable-layer-controls.md';
+const hydratedGeojsonPlanPath = 'docs/plans/2026-06-13-hydrated-geojson-validation.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
+const geojsonTestPath = 'scripts/test-geojson-validation.js';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -64,11 +205,13 @@ exists(hostedValidationPlanPath, 'hosted map validation docs plan');
 exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
 exists(behaviorTestPlanPath, 'map behavior test docs plan');
 exists(unavailableLayerPlanPath, 'unavailable layer controls docs plan');
+exists(hydratedGeojsonPlanPath, 'hydrated GeoJSON validation docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
+exists(geojsonTestPath, 'hydrated GeoJSON validation tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -127,7 +270,8 @@ for (const docsBaselineFile of ['README.md', 'VISION.md', 'SECURITY.md', 'CHANGE
 }
 
 const makefile = fs.readFileSync('Makefile', 'utf8').replace(/\r\n/g, '\n');
-if (!/test: lint\n\tnode scripts\/test-map-behavior\.js/.test(makefile)) {
+const testTarget = makefile.match(/^test: lint\n((?:\t.*\n)+)/m);
+if (!testTarget || !testTarget[1].includes('\tnode scripts/test-map-behavior.js\n')) {
   fail('Makefile test target must run the dependency-free map behavior tests');
 }
 
@@ -296,6 +440,46 @@ for (const contract of [
   }
 }
 
+if (fs.existsSync(geojsonTestPath)) {
+  const geojsonTests = fs.readFileSync(geojsonTestPath, 'utf8');
+  for (const contract of [
+    "assertAccepted('valid-geometries'",
+    "assertRejected('invalid-feature'",
+    "assertRejected('missing-geometry'",
+    "assertRejected('missing-geometries'",
+    "assertRejected('non-finite-position'",
+    "assertRejected('short-ring'",
+    "assertRejected('open-ring'",
+    "assertRejected('nested-collection'"
+  ]) {
+    if (!geojsonTests.includes(contract)) {
+      fail(`${geojsonTestPath} must preserve hydrated GeoJSON regression: ${contract}`);
+    }
+  }
+  if (!geojsonTests.includes('const baseline = runChecker(ROOT)')) {
+    fail(`${geojsonTestPath} must validate the clean repository before fixture mutations`);
+  }
+  if (!geojsonTests.includes('fs.unlinkSync(datasetPath)')) {
+    fail(`${geojsonTestPath} must break fixture hard links before replacement`);
+  }
+}
+
+for (const contract of [
+  'function validateFeatureCollection',
+  'function validateGeometry',
+  'function validateLinearRing',
+  'must be a finite number',
+  'must be closed with matching first and last positions'
+]) {
+  if (!fs.readFileSync('scripts/check-map-assets.js', 'utf8').includes(contract)) {
+    fail(`hydrated GeoJSON validator must preserve: ${contract}`);
+  }
+}
+
+if (!testTarget || !testTarget[1].includes('\tnode scripts/test-geojson-validation.js\n')) {
+  fail('Makefile test gate must run hydrated GeoJSON validation tests');
+}
+
 for (const match of script.matchAll(/['"]((?:geojson|images)\/[^'"]+)['"]/g)) {
   exists(match[1], 'map-script.js');
 }
@@ -337,8 +521,7 @@ for (const file of fs.readdirSync('geojson').filter(name => name.endsWith('.geoj
 
   try {
     const parsed = JSON.parse(content);
-    assert.equal(parsed.type, 'FeatureCollection');
-    assert.ok(Array.isArray(parsed.features), 'features must be an array');
+    validateFeatureCollection(parsed, relativePath).forEach(fail);
   } catch (error) {
     fail(`${relativePath} is not a valid GeoJSON FeatureCollection: ${error.message}`);
   }

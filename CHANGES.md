@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-06-13
+
+- Added dependency-free RFC 7946 structural validation for hydrated GeoJSON
+  features, supported geometries, finite positions, coordinate nesting, and
+  polygon ring closure while preserving valid Git LFS pointers.
+- Added isolated valid-geometry and malformed-dataset regression fixtures to
+  the canonical test gate.
+
 ## 2026-06-12
 
 - Disabled layer controls when marker-image failures prevent their Mapbox
