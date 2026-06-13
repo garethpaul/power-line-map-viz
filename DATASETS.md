@@ -28,6 +28,10 @@ terms, and refresh dates are not recorded in this repository yet.
 ## Maintenance Rules
 
 - Keep private infrastructure data out of this repository.
+- Hydrated files must remain structurally valid RFC 7946 FeatureCollections;
+  the offline gate validates features, supported geometries, finite positions,
+  coordinate nesting, and closed polygon rings without claiming semantic
+  accuracy.
 - Do not treat these layers as operational, emergency, or compliance-grade
   data until source and freshness are documented.
 - Record source URL, license or permission basis, collection date, refresh

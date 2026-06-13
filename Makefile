@@ -6,6 +6,7 @@ lint:
 	node scripts/check-map-assets.js
 
 test: lint
+	node scripts/test-geojson-validation.js
 	node scripts/test-map-behavior.js
 
 build: lint

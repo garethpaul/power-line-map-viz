@@ -1,13 +1,13 @@
 ---
 title: Hydrated GeoJSON Structure Validation
 type: test
-status: planned
+status: completed
 date: 2026-06-13
 ---
 
 # Hydrated GeoJSON Structure Validation
 
-Status: Planned
+Status: Completed
 
 ## Context
 
@@ -162,3 +162,40 @@ Requirements:
 - `scripts/check-map-assets.js`
 - `DATASETS.md`
 - `docs/plans/2026-06-08-dataset-inventory-baseline.md`
+
+## Work Completed
+
+- Added single-pass structural validation for hydrated FeatureCollections,
+  Features, IDs, properties, null geometries, all seven RFC 7946 geometry
+  types, finite positions, coordinate nesting, line cardinality, and closed
+  polygon rings.
+- Preserved the existing exact Git LFS pointer validation path and all three
+  checked-in pointer blobs.
+- Added an isolated hard-linked fixture suite with one valid collection
+  covering every geometry family and 15 malformed dataset cases.
+- Made the fixture suite validate the clean repository first and unlink each
+  pointer before replacing it, preventing accidental mutation of checked-in
+  data.
+- Wired the suite into `make test` and protected the implementation, test
+  labels, Makefile wiring, completed plan, and documentation through the
+  repository checker.
+- Updated README, DATASETS, VISION, and CHANGES without claiming provenance,
+  freshness, topology, semantic accuracy, or live map coverage.
+
+## Verification Results
+
+- `node --check` passed for the checker, GeoJSON fixture suite, and existing
+  browser behavior suite on Node 20.19.5.
+- `node scripts/test-geojson-validation.js` passed the valid fixture and all 15
+  malformed cases.
+- `make lint`, `make test`, `make build`, `make verify`, and `make check`
+  passed.
+- Checker execution from `/` passed.
+- The base and current GeoJSON Git-tree aggregate SHA-256 values both equal
+  `e627341a595756c5292cc7662b8d9d327555ec20344884f2638cd67fe6d8919e`.
+- Plan-aware review found one test-completeness gap; missing Feature geometry,
+  missing GeometryCollection members, and short polygon ring regressions were
+  added, after which no actionable findings remained.
+- Browser automation was not applicable to this offline validation-only change;
+  `agent-browser` was unavailable and the existing VM map behavior suite passed.
+- `git diff --check` passed.

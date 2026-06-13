@@ -69,7 +69,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - The verification gate checks local script/style references, marker and
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
-  hydrated GeoJSON shape or valid Git LFS pointer metadata.
+  hydrated RFC 7946 FeatureCollection, Feature, geometry, coordinate, and ring
+  structure or valid Git LFS pointer metadata.
 - It also checks that every checked-in `images/*` asset is inventoried as either
   a referenced marker image or a checked-in unused image.
 - It also checks the browser page title so the static map stays branded as
@@ -125,6 +126,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   canonical map-token and asset validation baseline.
 - See `docs/plans/2026-06-08-dataset-inventory-baseline.md` for the dataset
   inventory baseline.
+- See `docs/plans/2026-06-13-hydrated-geojson-validation.md` for offline RFC
+  7946 feature, geometry, coordinate, and polygon ring validation.
 - See `docs/plans/2026-06-08-layer-inventory-validation.md` for the
   GeoJSON-to-map-layer inventory guard.
 - See `docs/plans/2026-06-09-image-asset-inventory.md` for the checked-in image
