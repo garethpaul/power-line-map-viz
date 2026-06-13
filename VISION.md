@@ -25,6 +25,7 @@ Priority:
 - Validate hydrated GeoJSON features, geometries, finite positions, coordinate
   nesting, and polygon ring closure while preserving Git LFS pointer checkouts
 - Keep layer toggles and power-line animation easy to understand
+- Keep asynchronous marker layer controls synchronized with actual availability
 - Maintain `make check`, `make verify`, and `make build` as the local map asset
   and data-reference gates
 - Keep GitHub Actions running the Node-backed `make check` baseline before
