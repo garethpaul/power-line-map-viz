@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-15
+
+- Made the first toggle click hide layers whose Mapbox visibility is unset and
+  therefore defaults to visible.
+
 ## 2026-06-13
 
 - Synchronized delayed marker-layer success with existing disabled controls

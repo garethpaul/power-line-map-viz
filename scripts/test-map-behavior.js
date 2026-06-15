@@ -127,6 +127,19 @@ function main() {
   assert.equal(missingToken.menu.children[0].className, 'active');
   assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
 
+  const defaultVisibleMap = {
+    visibility: undefined,
+    getLayer() { return true; },
+    getLayoutProperty() { return this.visibility; },
+    setLayoutProperty(_id, _property, value) { this.visibility = value; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(defaultVisibleMap);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+  click(missingToken.menu.children[0]);
+  assert.equal(defaultVisibleMap.visibility, 'none');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+
   const toggleMap = {
     visibility: 'visible',
     getLayer() { return true; },

@@ -71,7 +71,7 @@ function setupLayerToggles(map) {
             var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
 
             // Change the visibility when the individual has clicked.
-            if (visibility === 'visible') {
+            if (visibility !== 'none') {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                 this.className = '';
                 this.setAttribute('aria-pressed', 'false');

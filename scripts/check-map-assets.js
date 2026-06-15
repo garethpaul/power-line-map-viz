@@ -182,6 +182,7 @@ const hydratedGeojsonPlanPath = 'docs/plans/2026-06-13-hydrated-geojson-validati
 const initialLayerVisibilityPlanPath = 'docs/plans/2026-06-13-initial-layer-toggle-visibility.md';
 const asyncLayerTogglePlanPath = 'docs/plans/2026-06-13-async-layer-toggle-sync.md';
 const locationIndependentMakePlanPath = 'docs/plans/2026-06-14-location-independent-make.md';
+const defaultVisibilityTogglePlanPath = 'docs/plans/2026-06-15-default-layer-visibility-toggle.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
 const geojsonTestPath = 'scripts/test-geojson-validation.js';
@@ -212,12 +213,13 @@ exists(hydratedGeojsonPlanPath, 'hydrated GeoJSON validation docs plan');
 exists(initialLayerVisibilityPlanPath, 'initial layer visibility docs plan');
 exists(asyncLayerTogglePlanPath, 'asynchronous layer toggle synchronization docs plan');
 exists(locationIndependentMakePlanPath, 'location-independent Make docs plan');
+exists(defaultVisibilityTogglePlanPath, 'default layer visibility toggle docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
 exists(geojsonTestPath, 'hydrated GeoJSON validation tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath, initialLayerVisibilityPlanPath, asyncLayerTogglePlanPath, locationIndependentMakePlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath, initialLayerVisibilityPlanPath, asyncLayerTogglePlanPath, locationIndependentMakePlanPath, defaultVisibilityTogglePlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -450,6 +452,10 @@ if (!script.includes("map.getLayoutProperty(layerId, 'visibility') !== 'none'") 
   fail('map-script.js must disable unavailable layer toggles and expose their actual pressed state');
 }
 
+if (!script.includes("if (visibility !== 'none')")) {
+  fail('map-script.js must hide default-visible layers on the first toggle click');
+}
+
 if (!readme.includes('Unavailable marker layers expose disabled, unpressed controls')) {
   fail('README.md must document unavailable marker layer control behavior');
 }
@@ -489,6 +495,8 @@ for (const contract of [
   "assert.equal(missingToken.menu.children[0].className, '')",
   "assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false')",
   "assert.equal(initiallyHiddenMap.visibility, 'visible')",
+  'visibility: undefined',
+  "assert.equal(defaultVisibleMap.visibility, 'none')",
   'assert.equal(delayedImages.menu.children[1].disabled, false)',
   'assert.equal(delayedImages.menu.children[2].disabled, true)',
   "delayedImages.imageCallbacks[1](new Error('/private/map-assets/cell-towers.png'))"

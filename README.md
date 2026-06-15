@@ -95,6 +95,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   asynchronous image callback adds the layer; failed siblings remain disabled.
 - Available layers configured as initially hidden expose inactive, unpressed
   controls until the user shows them.
+- Layers using Mapbox's default visible state hide on the first control click,
+  matching layers with an explicit visible layout value.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths
