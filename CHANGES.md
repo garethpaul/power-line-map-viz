@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-16
+
+- Stopped the power-line animation interval when its Mapbox layer disappears,
+  preventing stale paint updates after style lifecycle changes.
+
 ## 2026-06-15
 
 - Made the first toggle click hide layers whose Mapbox visibility is unset and

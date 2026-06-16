@@ -1,6 +1,6 @@
 # Power-Line Animation Lifecycle
 
-Status: Planned
+Status: Completed
 
 ## Context
 
@@ -52,3 +52,26 @@ exists.
   missing layer.
 - Interval cancellation must use the exact identifier returned for that
   animation instance.
+
+## Work Completed
+
+- Retained the animation interval identifier and cleared it before returning
+  whenever the target Mapbox layer is no longer available.
+- Extended the VM map stub to reject paint updates for missing layers and to
+  record interval cancellation.
+- Added a lifecycle regression that paints one frame, removes `power_lines`,
+  invokes the scheduled callback, and proves there is no exception or second
+  paint update and the exact timer is cleared.
+- Added static runtime, test, documentation, changelog, and completed-plan
+  contracts.
+
+## Verification Results
+
+- `node --check map-script.js`, `node --check scripts/test-map-behavior.js`,
+  and the focused `node scripts/test-map-behavior.js` regression passed.
+- `make check` and the external-directory absolute-Makefile gate passed the
+  complete asset, GeoJSON, behavior, workflow, and plan contract suite.
+- Hostile mutations removing the missing-layer guard, timer cancellation, or
+  lifecycle regression were rejected.
+- `git diff --check` plus exact diff, secret, generated-artifact, conflict,
+  mode, binary, and large-file audits passed.

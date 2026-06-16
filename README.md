@@ -99,6 +99,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   matching layers with an explicit visible layout value.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
+- The power-line animation stops if its Mapbox layer disappears, avoiding
+  paint updates against a removed layer during style lifecycle changes.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths
   in a dependency-free Node VM harness.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and

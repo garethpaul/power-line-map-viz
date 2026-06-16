@@ -25,6 +25,7 @@ function createButton() {
 function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
   const warning = { hidden: true, textContent: '' };
   const menu = { hidden: true, children: [], appendChild(child) { this.children.push(child); } };
+  const clearedIntervals = [];
   const intervals = [];
   const imageCallbacks = [];
   const maps = [];
@@ -54,8 +55,12 @@ function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable
       callback(imageError, {});
     }
     on(event, callback) { if (event === 'load') callback(); }
+    removeLayer(id) { this.layers.delete(id); }
     setLayoutProperty(id, _property, value) { this.layout.set(id, value); }
-    setPaintProperty(id, property, value) { this.paintChanges.push({ id, property, value }); }
+    setPaintProperty(id, property, value) {
+      if (!this.layers.has(id)) throw new Error(`Layer ${id} does not exist`);
+      this.paintChanges.push({ id, property, value });
+    }
   }
 
   const sandbox = {
@@ -72,6 +77,9 @@ function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable
       intervals.push({ callback, delay });
       return intervals.length;
     },
+    clearInterval(intervalId) {
+      clearedIntervals.push(intervalId);
+    },
     window: {
       matchMedia(query) {
         assert.equal(query, '(prefers-reduced-motion: reduce)');
@@ -85,7 +93,7 @@ function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable
   }
 
   vm.runInNewContext(MAP_SCRIPT, sandbox, { filename: 'map-script.js' });
-  return { imageCallbacks, intervals, maps, menu, sandbox, warning };
+  return { clearedIntervals, imageCallbacks, intervals, maps, menu, sandbox, warning };
 }
 
 function click(button) {
@@ -167,6 +175,12 @@ function main() {
   assert.equal(animated.maps.length, 1);
   assert.equal(animated.intervals.length, 1);
   assert.equal(animated.intervals[0].delay, 30);
+  animated.intervals[0].callback();
+  assert.equal(animated.maps[0].paintChanges.length, 1);
+  animated.maps[0].removeLayer('power_lines');
+  assert.doesNotThrow(() => animated.intervals[0].callback());
+  assert.deepEqual(animated.clearedIntervals, [1]);
+  assert.equal(animated.maps[0].paintChanges.length, 1);
 
   const delayedImages = loadMapScript({ deferImages: true });
   delayedImages.sandbox.mapboxAccessToken = 'test-token';

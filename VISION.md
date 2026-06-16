@@ -50,6 +50,7 @@ Priority:
   tooling
 - Keep controls for unavailable map layers disabled and accurately unpressed
 - Keep power-line animation disabled when the browser requests reduced motion
+- Stop power-line animation when its target layer is no longer available
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 

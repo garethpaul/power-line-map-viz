@@ -121,7 +121,12 @@ function initializeMap() {
             [0, 2, 3, 2],
             [0, 3, 3, 1]
         ];
-        setInterval(function() {
+        var intervalId = setInterval(function() {
+            if (!map.getLayer(layerId)) {
+                clearInterval(intervalId);
+                return;
+            }
+
             step = (step + 1) % dashArraySeq.length;
             map.setPaintProperty(layerId, 'line-dasharray', dashArraySeq[step]);
         }, animationStep);
