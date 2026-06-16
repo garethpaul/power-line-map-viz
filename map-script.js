@@ -122,7 +122,7 @@ function initializeMap() {
             [0, 3, 3, 1]
         ];
         var intervalId = setInterval(function() {
-            if (!map.getLayer(layerId)) {
+            if (prefersReducedMotion() || !map.getLayer(layerId)) {
                 clearInterval(intervalId);
                 return;
             }

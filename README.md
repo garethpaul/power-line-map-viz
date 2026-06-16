@@ -99,6 +99,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   matching layers with an explicit visible layout value.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
+- Runtime reduced-motion changes stop an already-running power-line animation
+  before its next paint frame.
 - The power-line animation stops if its Mapbox layer disappears, avoiding
   paint updates against a removed layer during style lifecycle changes.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths

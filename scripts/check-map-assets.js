@@ -184,6 +184,7 @@ const asyncLayerTogglePlanPath = 'docs/plans/2026-06-13-async-layer-toggle-sync.
 const locationIndependentMakePlanPath = 'docs/plans/2026-06-14-location-independent-make.md';
 const defaultVisibilityTogglePlanPath = 'docs/plans/2026-06-15-default-layer-visibility-toggle.md';
 const animationLifecyclePlanPath = 'docs/plans/2026-06-16-power-line-animation-lifecycle.md';
+const runtimeReducedMotionPlanPath = 'docs/plans/2026-06-16-runtime-reduced-motion.md';
 const workflowPath = '.github/workflows/check.yml';
 const behaviorTestPath = 'scripts/test-map-behavior.js';
 const geojsonTestPath = 'scripts/test-geojson-validation.js';
@@ -216,12 +217,13 @@ exists(asyncLayerTogglePlanPath, 'asynchronous layer toggle synchronization docs
 exists(locationIndependentMakePlanPath, 'location-independent Make docs plan');
 exists(defaultVisibilityTogglePlanPath, 'default layer visibility toggle docs plan');
 exists(animationLifecyclePlanPath, 'power-line animation lifecycle docs plan');
+exists(runtimeReducedMotionPlanPath, 'runtime reduced-motion docs plan');
 exists(workflowPath, 'hosted map validation workflow');
 exists(behaviorTestPath, 'map behavior tests');
 exists(geojsonTestPath, 'hydrated GeoJSON validation tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath, initialLayerVisibilityPlanPath, asyncLayerTogglePlanPath, locationIndependentMakePlanPath, defaultVisibilityTogglePlanPath, animationLifecyclePlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath, hydratedGeojsonPlanPath, initialLayerVisibilityPlanPath, asyncLayerTogglePlanPath, locationIndependentMakePlanPath, defaultVisibilityTogglePlanPath, animationLifecyclePlanPath, runtimeReducedMotionPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -441,11 +443,28 @@ if (!/function\s+enableLineAnimation\b[\s\S]*?if\s*\(prefersReducedMotion\(\)\)\
 
 for (const contract of [
   'var intervalId = setInterval',
-  'if (!map.getLayer(layerId))',
+  'if (prefersReducedMotion() || !map.getLayer(layerId))',
   'clearInterval(intervalId)'
 ]) {
   if (!script.includes(contract)) {
     fail(`power-line animation must stop when its layer disappears: ${contract}`);
+  }
+}
+
+for (const contract of [
+  'setReducedMotion(value) { reducedMotion = value; }',
+  'runtimeReduced.setReducedMotion(true)',
+  'assert.deepEqual(runtimeReduced.clearedIntervals, [1])',
+  'assert.equal(runtimeReduced.maps[0].paintChanges.length, 0)'
+]) {
+  if (!fs.readFileSync(behaviorTestPath, 'utf8').includes(contract)) {
+    fail(`${behaviorTestPath} must preserve runtime reduced-motion regression: ${contract}`);
+  }
+}
+
+for (const documentPath of ['README.md', 'SECURITY.md', 'VISION.md', 'CHANGES.md']) {
+  if (!fs.readFileSync(documentPath, 'utf8').toLowerCase().includes('runtime reduced-motion changes')) {
+    fail(`${documentPath} must document runtime reduced-motion changes`);
   }
 }
 

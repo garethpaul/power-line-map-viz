@@ -93,7 +93,16 @@ function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable
   }
 
   vm.runInNewContext(MAP_SCRIPT, sandbox, { filename: 'map-script.js' });
-  return { clearedIntervals, imageCallbacks, intervals, maps, menu, sandbox, warning };
+  return {
+    clearedIntervals,
+    imageCallbacks,
+    intervals,
+    maps,
+    menu,
+    sandbox,
+    setReducedMotion(value) { reducedMotion = value; },
+    warning
+  };
 }
 
 function click(button) {
@@ -181,6 +190,14 @@ function main() {
   assert.doesNotThrow(() => animated.intervals[0].callback());
   assert.deepEqual(animated.clearedIntervals, [1]);
   assert.equal(animated.maps[0].paintChanges.length, 1);
+
+  const runtimeReduced = loadMapScript({ reducedMotion: false });
+  runtimeReduced.sandbox.mapboxAccessToken = 'test-token';
+  runtimeReduced.sandbox.initializeMap();
+  runtimeReduced.setReducedMotion(true);
+  runtimeReduced.intervals[0].callback();
+  assert.deepEqual(runtimeReduced.clearedIntervals, [1]);
+  assert.equal(runtimeReduced.maps[0].paintChanges.length, 0);
 
   const delayedImages = loadMapScript({ deferImages: true });
   delayedImages.sandbox.mapboxAccessToken = 'test-token';

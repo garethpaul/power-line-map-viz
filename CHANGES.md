@@ -2,6 +2,8 @@
 
 ## 2026-06-16
 
+- Runtime reduced-motion changes now stop an active power-line animation before
+  its next paint frame.
 - Stopped the power-line animation interval when its Mapbox layer disappears,
   preventing stale paint updates after style lifecycle changes.
 
