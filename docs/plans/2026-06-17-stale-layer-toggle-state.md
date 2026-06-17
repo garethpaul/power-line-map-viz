@@ -1,6 +1,6 @@
 # Stale Layer Toggle State
 
-Status: Planned
+Status: Completed
 
 ## Context
 
@@ -37,3 +37,25 @@ enabled and pressed button for a layer that no longer exists.
   state, regression execution, guidance, and completed plan status.
 - Audit the exact diff, generated artifacts, credentials, conflicts, modes,
   binaries, large files, and whitespace before commit and push.
+
+## Work Completed
+
+- Reused the existing control-state synchronization helper when a click finds
+  that its backing layer is no longer available.
+- Added a dependency-free regression that removes availability after setup and
+  proves the clicked control becomes disabled and unpressed without a layout
+  mutation.
+- Added static runtime, behavior, README guidance, changelog, and completed-plan
+  contracts.
+
+## Verification Results
+
+- Node 22.22.1 and Node 24.16.0 passed JavaScript syntax checks, the focused map
+  behavior regression, repository `make check`, and the absolute-Makefile gate
+  from `/tmp`.
+- Seven isolated hostile mutations were rejected across click-path
+  resynchronization, removal transition execution, disabled state, pressed
+  state, layout-mutation suppression, README guidance, and completed plan
+  status.
+- Exact diff, generated-artifact, credential, conflict-marker, mode, binary,
+  large-file, and whitespace audits were completed before commit.

@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-17
+
+- Resynchronized stale layer controls when their backing Mapbox layer is
+  removed before a click, disabling the control without a layout mutation.
+
 ## 2026-06-16
 
 - Runtime reduced-motion changes now stop an active power-line animation before

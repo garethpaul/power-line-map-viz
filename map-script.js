@@ -65,6 +65,7 @@ function setupLayerToggles(map) {
             e.stopPropagation();
 
             if (!map.getLayer(clickedLayer)) {
+                syncLayerToggleState(map, this);
                 return;
             }
 

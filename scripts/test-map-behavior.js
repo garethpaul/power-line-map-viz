@@ -172,6 +172,23 @@ function main() {
   assert.equal(toggleMap.visibility, 'visible');
   assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
 
+  const staleLayerMap = {
+    available: true,
+    layoutChanges: 0,
+    getLayer() { return this.available; },
+    getLayoutProperty() { return 'visible'; },
+    setLayoutProperty() { this.layoutChanges += 1; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(staleLayerMap);
+  assert.equal(missingToken.menu.children[0].disabled, false);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+  staleLayerMap.available = false;
+  click(missingToken.menu.children[0]);
+  assert.equal(missingToken.menu.children[0].disabled, true);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+  assert.equal(staleLayerMap.layoutChanges, 0);
+
   const reduced = loadMapScript({ reducedMotion: true });
   reduced.sandbox.mapboxAccessToken = 'test-token';
   reduced.sandbox.initializeMap();

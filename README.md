@@ -93,6 +93,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   claiming that a layer which failed to load is active.
 - Successfully loaded marker layers enable their existing controls after the
   asynchronous image callback adds the layer; failed siblings remain disabled.
+- Controls for layers removed after setup disable themselves when clicked and
+  report an unpressed state instead of retaining stale availability.
 - Available layers configured as initially hidden expose inactive, unpressed
   controls until the user shows them.
 - Layers using Mapbox's default visible state hide on the first control click,
