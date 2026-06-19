@@ -22,7 +22,10 @@ The current focus is:
 Priority:
 
 - Preserve the local GeoJSON layer structure
+- Validate hydrated GeoJSON features, geometries, finite positions, coordinate
+  nesting, and polygon ring closure while preserving Git LFS pointer checkouts
 - Keep layer toggles and power-line animation easy to understand
+- Keep asynchronous marker layer controls synchronized with actual availability
 - Maintain `make check`, `make verify`, and `make build` as the local map asset
   and data-reference gates
 - Keep GitHub Actions running the Node-backed `make check` baseline before
@@ -48,6 +51,8 @@ Priority:
   tooling
 - Keep controls for unavailable map layers disabled and accurately unpressed
 - Keep power-line animation disabled when the browser requests reduced motion
+- Honor runtime reduced-motion changes before the next animation paint
+- Stop power-line animation when its target layer is no longer available
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 

@@ -61,6 +61,10 @@ Marker-image failures should use a stable browser warning and must not expose
 raw provider or filesystem error details.
 Layer controls for failed marker assets stay disabled and unpressed so the UI
 does not claim unavailable infrastructure data is visible.
+Controls are enabled only after the corresponding asynchronous marker layer is
+successfully added, preventing premature interaction with unavailable data.
+Runtime reduced-motion changes stop an active power-line animation before its
+next paint, preserving the user's current accessibility preference.
 
 ## Dependency and Supply Chain Security
 

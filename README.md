@@ -69,7 +69,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - The verification gate checks local script/style references, marker and
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
-  hydrated GeoJSON shape or valid Git LFS pointer metadata.
+  hydrated RFC 7946 FeatureCollection, Feature, geometry, coordinate, and ring
+  structure or valid Git LFS pointer metadata.
 - It also checks that every checked-in `images/*` asset is inventoried as either
   a referenced marker image or a checked-in unused image.
 - It also checks the browser page title so the static map stays branded as
@@ -90,8 +91,20 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   state instead of links that only expose state through CSS.
 - Unavailable marker layers expose disabled, unpressed controls instead of
   claiming that a layer which failed to load is active.
+- Successfully loaded marker layers enable their existing controls after the
+  asynchronous image callback adds the layer; failed siblings remain disabled.
+- Controls for layers removed after setup disable themselves when clicked and
+  report an unpressed state instead of retaining stale availability.
+- Available layers configured as initially hidden expose inactive, unpressed
+  controls until the user shows them.
+- Layers using Mapbox's default visible state hide on the first control click,
+  matching layers with an explicit visible layout value.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
+- Runtime reduced-motion changes stop an already-running power-line animation
+  before its next paint frame.
+- The power-line animation stops if its Mapbox layer disappears, avoiding
+  paint updates against a removed layer during style lifecycle changes.
 - It executes the no-token, layer-toggle, reduced-motion, and animation paths
   in a dependency-free Node VM harness.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
@@ -128,6 +141,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   canonical map-token and asset validation baseline.
 - See `docs/plans/2026-06-08-dataset-inventory-baseline.md` for the dataset
   inventory baseline.
+- See `docs/plans/2026-06-13-hydrated-geojson-validation.md` for offline RFC
+  7946 feature, geometry, coordinate, and polygon ring validation.
 - See `docs/plans/2026-06-08-layer-inventory-validation.md` for the
   GeoJSON-to-map-layer inventory guard.
 - See `docs/plans/2026-06-09-image-asset-inventory.md` for the checked-in image
@@ -153,6 +168,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   animation accessibility guard.
 - See `docs/plans/2026-06-12-unavailable-layer-controls.md` for disabled control
   behavior when marker layers fail to load.
+- See `docs/plans/2026-06-13-async-layer-toggle-sync.md` for delayed marker
+  success and failure control synchronization.
 
 ## Contributing
 

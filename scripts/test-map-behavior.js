@@ -22,10 +22,12 @@ function createButton() {
   };
 }
 
-function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
+function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
   const warning = { hidden: true, textContent: '' };
   const menu = { hidden: true, children: [], appendChild(child) { this.children.push(child); } };
+  const clearedIntervals = [];
   const intervals = [];
+  const imageCallbacks = [];
   const maps = [];
 
   class MapStub {
@@ -45,10 +47,20 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
     }
     getLayer(id) { return this.layers.get(id); }
     getLayoutProperty(id) { return this.layout.get(id) || 'visible'; }
-    loadImage(_url, callback) { callback(imageError, {}); }
+    loadImage(_url, callback) {
+      if (deferImages) {
+        imageCallbacks.push(callback);
+        return;
+      }
+      callback(imageError, {});
+    }
     on(event, callback) { if (event === 'load') callback(); }
+    removeLayer(id) { this.layers.delete(id); }
     setLayoutProperty(id, _property, value) { this.layout.set(id, value); }
-    setPaintProperty(id, property, value) { this.paintChanges.push({ id, property, value }); }
+    setPaintProperty(id, property, value) {
+      if (!this.layers.has(id)) throw new Error(`Layer ${id} does not exist`);
+      this.paintChanges.push({ id, property, value });
+    }
   }
 
   const sandbox = {
@@ -65,6 +77,9 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
       intervals.push({ callback, delay });
       return intervals.length;
     },
+    clearInterval(intervalId) {
+      clearedIntervals.push(intervalId);
+    },
     window: {
       matchMedia(query) {
         assert.equal(query, '(prefers-reduced-motion: reduce)');
@@ -78,7 +93,16 @@ function loadMapScript({ imageError = null, mapboxAvailable = true, reducedMotio
   }
 
   vm.runInNewContext(MAP_SCRIPT, sandbox, { filename: 'map-script.js' });
-  return { intervals, maps, menu, sandbox, warning };
+  return {
+    clearedIntervals,
+    imageCallbacks,
+    intervals,
+    maps,
+    menu,
+    sandbox,
+    setReducedMotion(value) { reducedMotion = value; },
+    warning
+  };
 }
 
 function click(button) {
@@ -103,6 +127,36 @@ function main() {
   assert.equal(missingToken.menu.hidden, false);
   assert.equal(missingToken.menu.children.length, 3);
   assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+
+  const initiallyHiddenMap = {
+    visibility: 'none',
+    getLayer() { return true; },
+    getLayoutProperty() { return this.visibility; },
+    setLayoutProperty(_id, _property, value) { this.visibility = value; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(initiallyHiddenMap);
+  assert.equal(missingToken.menu.children[0].disabled, false);
+  assert.equal(missingToken.menu.children[0].className, '');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+  click(missingToken.menu.children[0]);
+  assert.equal(initiallyHiddenMap.visibility, 'visible');
+  assert.equal(missingToken.menu.children[0].className, 'active');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+
+  const defaultVisibleMap = {
+    visibility: undefined,
+    getLayer() { return true; },
+    getLayoutProperty() { return this.visibility; },
+    setLayoutProperty(_id, _property, value) { this.visibility = value; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(defaultVisibleMap);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+  click(missingToken.menu.children[0]);
+  assert.equal(defaultVisibleMap.visibility, 'none');
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+
   const toggleMap = {
     visibility: 'visible',
     getLayer() { return true; },
@@ -118,6 +172,23 @@ function main() {
   assert.equal(toggleMap.visibility, 'visible');
   assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
 
+  const staleLayerMap = {
+    available: true,
+    layoutChanges: 0,
+    getLayer() { return this.available; },
+    getLayoutProperty() { return 'visible'; },
+    setLayoutProperty() { this.layoutChanges += 1; }
+  };
+  missingToken.menu.children.length = 0;
+  missingToken.sandbox.setupLayerToggles(staleLayerMap);
+  assert.equal(missingToken.menu.children[0].disabled, false);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'true');
+  staleLayerMap.available = false;
+  click(missingToken.menu.children[0]);
+  assert.equal(missingToken.menu.children[0].disabled, true);
+  assert.equal(missingToken.menu.children[0].getAttribute('aria-pressed'), 'false');
+  assert.equal(staleLayerMap.layoutChanges, 0);
+
   const reduced = loadMapScript({ reducedMotion: true });
   reduced.sandbox.mapboxAccessToken = 'test-token';
   reduced.sandbox.initializeMap();
@@ -130,6 +201,35 @@ function main() {
   assert.equal(animated.maps.length, 1);
   assert.equal(animated.intervals.length, 1);
   assert.equal(animated.intervals[0].delay, 30);
+  animated.intervals[0].callback();
+  assert.equal(animated.maps[0].paintChanges.length, 1);
+  animated.maps[0].removeLayer('power_lines');
+  assert.doesNotThrow(() => animated.intervals[0].callback());
+  assert.deepEqual(animated.clearedIntervals, [1]);
+  assert.equal(animated.maps[0].paintChanges.length, 1);
+
+  const runtimeReduced = loadMapScript({ reducedMotion: false });
+  runtimeReduced.sandbox.mapboxAccessToken = 'test-token';
+  runtimeReduced.sandbox.initializeMap();
+  runtimeReduced.setReducedMotion(true);
+  runtimeReduced.intervals[0].callback();
+  assert.deepEqual(runtimeReduced.clearedIntervals, [1]);
+  assert.equal(runtimeReduced.maps[0].paintChanges.length, 0);
+
+  const delayedImages = loadMapScript({ deferImages: true });
+  delayedImages.sandbox.mapboxAccessToken = 'test-token';
+  delayedImages.sandbox.initializeMap();
+  assert.equal(delayedImages.imageCallbacks.length, 2);
+  assert.equal(delayedImages.menu.children[1].disabled, true);
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  delayedImages.imageCallbacks[0](null, {});
+  assert.equal(delayedImages.menu.children[1].disabled, false);
+  assert.equal(delayedImages.menu.children[1].className, 'active');
+  assert.equal(delayedImages.menu.children[1].getAttribute('aria-pressed'), 'true');
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  delayedImages.imageCallbacks[1](new Error('/private/map-assets/cell-towers.png'));
+  assert.equal(delayedImages.menu.children[2].disabled, true);
+  assert.equal(delayedImages.menu.children[2].getAttribute('aria-pressed'), 'false');
 
   const missingImage = loadMapScript({ imageError: new Error('/private/map-assets/power-stations.png') });
   missingImage.sandbox.mapboxAccessToken = 'test-token';
