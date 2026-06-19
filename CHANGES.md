@@ -2,6 +2,8 @@
 
 ## 2026-06-12
 
+- Bound the pinned Mapbox JavaScript and CSS CDN resources to reviewed SHA-384
+  Subresource Integrity values and fail-closed static contracts.
 - Disabled layer controls when marker-image failures prevent their Mapbox
   layers from loading, with executable accessibility regression coverage.
 

@@ -96,6 +96,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   in a dependency-free Node VM harness.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
+- The pinned Mapbox JavaScript and CSS tags include reviewed SHA-384
+  Subresource Integrity values and anonymous cross-origin mode. Refresh both
+  HTML and checker values from the official CDN bytes when Mapbox changes.
 - It also requires a completed canonical plan under `docs/plans/`.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
