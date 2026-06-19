@@ -1,8 +1,51 @@
 # Changes
 
+## 2026-06-17
+
+- Resynchronized stale layer controls when their backing Mapbox layer is
+  removed before a click, disabling the control without a layout mutation.
+
+## 2026-06-16
+
+- Runtime reduced-motion changes now stop an active power-line animation before
+  its next paint frame.
+- Stopped the power-line animation interval when its Mapbox layer disappears,
+  preventing stale paint updates after style lifecycle changes.
+
+## 2026-06-15
+
+- Made the first toggle click hide layers whose Mapbox visibility is unset and
+  therefore defaults to visible.
+
+## 2026-06-13
+
+- Synchronized delayed marker-layer success with existing disabled controls
+  while preserving failure-disabled state.
+- Synchronized each layer control's initial active and pressed state with the
+  layer's actual Mapbox layout visibility.
+- Added dependency-free RFC 7946 structural validation for hydrated GeoJSON
+  features, supported geometries, finite positions, coordinate nesting, and
+  polygon ring closure while preserving valid Git LFS pointers.
+- Added isolated valid-geometry and malformed-dataset regression fixtures to
+  the canonical test gate.
+
+## 2026-06-12
+
+- Bound the pinned Mapbox JavaScript and CSS CDN resources to reviewed SHA-384
+  Subresource Integrity values and fail-closed static contracts.
+- Disabled layer controls when marker-image failures prevent their Mapbox
+  layers from loading, with executable accessibility regression coverage.
+
 ## 2026-06-10
 
-- Added pinned, read-only hosted map contract validation on Node 20 and Node 24
+- Added a GitHub Actions check workflow that runs the existing Node-backed
+  `make check` map asset baseline on pushes, pull requests, and manual
+  dispatches.
+- Added a map asset guard requiring the CI workflow and completed CI baseline
+  plan to remain checked in.
+- Pinned hosted actions and validate the dependency-free map contracts on
+  maintained Node 22 and Node 24 with read-only permissions.
+- Added pinned, read-only hosted map contract validation on Node 22 and Node 24
   without dependency installation.
 - Made the map validator independent of the caller's working directory and
   protected the hosted workflow contract locally.
@@ -10,6 +53,9 @@
   exposed to assistive tooling.
 - Added a reduced-motion guard so the power-line layer remains static when the
   browser requests less animation.
+- Added dependency-free executable tests for token warnings, layer toggle
+  state, and reduced-motion animation behavior.
+- Replaced unhandled marker-image errors with a stable visible warning.
 
 ## 2026-06-09
 

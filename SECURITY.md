@@ -29,6 +29,9 @@ Helpful reports include:
 - Review found network clients, sockets, web APIs, or service endpoints; changes in those areas should receive security-focused review before merge.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
+- GitHub Actions runs the Node-backed `make check` map asset baseline before
+  review with read-only permissions, pinned actions, and no retained checkout
+  credentials.
 
 ## Service and API Notes
 
@@ -38,6 +41,10 @@ The browser page intentionally loads Mapbox GL JS/CSS and Google Fonts from
 fixed remote URLs. Run `make check` before changing `index.html`; it rejects
 new remote script or stylesheet references unless they are explicitly
 allowlisted.
+The two Mapbox resources are additionally bound to reviewed SHA-384
+Subresource Integrity values with anonymous cross-origin mode. An intentional
+Mapbox update must verify the official CDN bytes and update the HTML and static
+checker contracts together.
 
 The no-token Mapbox warning should remain an accessible status live region so
 users are told why the local map is not rendering instead of seeing a silent
@@ -50,6 +57,14 @@ The root HTML language should stay declared so assistive technology and browser
 language tooling can interpret the static map page consistently.
 The map container should stay exposed as a labelled region so users can
 identify the primary infrastructure map even when visual rendering fails.
+Marker-image failures should use a stable browser warning and must not expose
+raw provider or filesystem error details.
+Layer controls for failed marker assets stay disabled and unpressed so the UI
+does not claim unavailable infrastructure data is visible.
+Controls are enabled only after the corresponding asynchronous marker layer is
+successfully added, preventing premature interaction with unavailable data.
+Runtime reduced-motion changes stop an active power-line animation before its
+next paint, preserving the user's current accessibility preference.
 
 ## Dependency and Supply Chain Security
 

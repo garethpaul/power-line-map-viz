@@ -11,6 +11,32 @@ function showMapTokenWarning(message) {
     warning.hidden = false;
 }
 
+function syncLayerToggleState(map, button) {
+    var layerId = button.dataset.layerId;
+    var layerAvailable = Boolean(map.getLayer(layerId));
+    var layerVisible = layerAvailable &&
+        map.getLayoutProperty(layerId, 'visibility') !== 'none';
+
+    button.disabled = !layerAvailable;
+    button.className = layerVisible ? 'active' : '';
+    button.setAttribute('aria-pressed', layerVisible ? 'true' : 'false');
+}
+
+function syncLayerToggle(map, layerId) {
+    var layers = document.getElementById('menu');
+
+    if (!layers) {
+        return;
+    }
+
+    for (var i = 0; i < layers.children.length; i++) {
+        if (layers.children[i].dataset.layerId === layerId) {
+            syncLayerToggleState(map, layers.children[i]);
+            return;
+        }
+    }
+}
+
 function setupLayerToggles(map) {
     var toggleableLayerIds = [
         {'id': 'power_lines', 'name': "Power Lines"},
@@ -28,10 +54,9 @@ function setupLayerToggles(map) {
     for (var i = 0; i < toggleableLayerIds.length; i++) {
         var link = document.createElement('button');
         link.type = 'button';
-        link.className = 'active';
         link.textContent = toggleableLayerIds[i]['name'];
         link.dataset.layerId = toggleableLayerIds[i]['id'];
-        link.setAttribute('aria-pressed', 'true');
+        syncLayerToggleState(map, link);
 
         // Handle clicks on the layer toggle button.
         link.onclick = function (e) {
@@ -40,13 +65,14 @@ function setupLayerToggles(map) {
             e.stopPropagation();
 
             if (!map.getLayer(clickedLayer)) {
+                syncLayerToggleState(map, this);
                 return;
             }
 
             var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
 
             // Change the visibility when the individual has clicked.
-            if (visibility === 'visible') {
+            if (visibility !== 'none') {
                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                 this.className = '';
                 this.setAttribute('aria-pressed', 'false');
@@ -96,7 +122,12 @@ function initializeMap() {
             [0, 2, 3, 2],
             [0, 3, 3, 1]
         ];
-        setInterval(function() {
+        var intervalId = setInterval(function() {
+            if (prefersReducedMotion() || !map.getLayer(layerId)) {
+                clearInterval(intervalId);
+                return;
+            }
+
             step = (step + 1) % dashArraySeq.length;
             map.setPaintProperty(layerId, 'line-dasharray', dashArraySeq[step]);
         }, animationStep);
@@ -109,7 +140,10 @@ function initializeMap() {
         // Load Power Stations
         var powerStationsUrl = 'geojson/power_stations.geojson';
         map.loadImage("images/power-stations.png", function(error, image) { //this is where we load the image file
-        if (error) throw error;
+        if (error) {
+            showMapTokenWarning('A map marker image could not be loaded. Check the local image assets and reload the page.');
+            return;
+        }
             map.addImage("custom-marker", image);
             map.addLayer({
             'id': 'power_stations',
@@ -124,12 +158,16 @@ function initializeMap() {
                 "icon-size": 0.5 //this is a multiplier applied to the standard size. So if you want it half the size put ".5"
             }
             });
+            syncLayerToggle(map, 'power_stations');
         });
 
         // Load Cell Towers
         var cellTowersUrl = 'geojson/cell_towers.geojson';
         map.loadImage("images/cell-towers.png", function(error, image) { //this is where we load the image file
-        if (error) throw error;
+        if (error) {
+            showMapTokenWarning('A map marker image could not be loaded. Check the local image assets and reload the page.');
+            return;
+        }
             map.addImage("cell-tower", image);
             map.addLayer({
             'id': 'cell_towers',
@@ -144,6 +182,7 @@ function initializeMap() {
                 "icon-size": 0.5 //this is a multiplier applied to the standard size. So if you want it half the size put ".5"
             }
             });
+            syncLayerToggle(map, 'cell_towers');
         });
 
 

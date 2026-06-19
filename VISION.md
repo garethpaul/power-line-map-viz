@@ -22,17 +22,25 @@ The current focus is:
 Priority:
 
 - Preserve the local GeoJSON layer structure
+- Validate hydrated GeoJSON features, geometries, finite positions, coordinate
+  nesting, and polygon ring closure while preserving Git LFS pointer checkouts
 - Keep layer toggles and power-line animation easy to understand
+- Keep asynchronous marker layer controls synchronized with actual availability
 - Maintain `make check`, `make verify`, and `make build` as the local map asset
   and data-reference gates
-- Run the dependency-free map contracts on Node 20 and Node 24 in hosted CI
+- Keep GitHub Actions running the Node-backed `make check` baseline before
+  review on maintained Node 22 and Node 24 runtimes
+- Run the dependency-free map contracts on Node 22 and Node 24 in hosted CI
   with read-only permissions and pinned actions
 - Keep map validation independent of the caller's working directory
+- Keep dependency-free executable coverage for token warnings, layer toggles,
+  and reduced-motion behavior
 - Keep GeoJSON filenames, Mapbox layer IDs, toggles, and dataset inventory rows aligned
 - Keep checked-in image marker assets inventoried by referenced or unused status
 - Keep completed maintenance plans under `docs/plans`
 - Keep the browser page title aligned with the Power Line Map purpose
 - Keep intentional remote browser assets allowlisted and explicit
+- Bind pinned Mapbox JavaScript and CSS to reviewed Subresource Integrity hashes
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
 - Keep the no-token warning accessible as a status live region
@@ -41,7 +49,10 @@ Priority:
 - Keep the primary map container exposed as a labelled region
 - Keep layer toggles labelled and expose visible/hidden state to assistive
   tooling
+- Keep controls for unavailable map layers disabled and accurately unpressed
 - Keep power-line animation disabled when the browser requests reduced motion
+- Honor runtime reduced-motion changes before the next animation paint
+- Stop power-line animation when its target layer is no longer available
 - Make infrastructure data provenance visible
 - Maintain `DATASETS.md` before adding or refreshing infrastructure layers
 
@@ -58,6 +69,8 @@ Contribution rules:
 - Do not commit access tokens or private infrastructure data.
 - Keep data refreshes separate from UI changes.
 - Include a screenshot or manual verification note for visual changes.
+- Keep `.github/workflows/check.yml` aligned with the dependency-free map asset
+  validator.
 
 ## Security And Responsible Use
 
