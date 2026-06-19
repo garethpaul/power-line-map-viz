@@ -29,6 +29,9 @@ Helpful reports include:
 - Review found network clients, sockets, web APIs, or service endpoints; changes in those areas should receive security-focused review before merge.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
+- GitHub Actions runs the Node-backed `make check` map asset baseline before
+  review with read-only permissions, pinned actions, and no retained checkout
+  credentials.
 
 ## Service and API Notes
 
@@ -50,6 +53,10 @@ The root HTML language should stay declared so assistive technology and browser
 language tooling can interpret the static map page consistently.
 The map container should stay exposed as a labelled region so users can
 identify the primary infrastructure map even when visual rendering fails.
+Marker-image failures should use a stable browser warning and must not expose
+raw provider or filesystem error details.
+Layer controls for failed marker assets stay disabled and unpressed so the UI
+does not claim unavailable infrastructure data is visible.
 
 ## Dependency and Supply Chain Security
 

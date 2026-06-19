@@ -51,15 +51,21 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 - Open `index.html` in a browser or serve the directory with a static file server.
 - The checked-in page shows a browser warning until a Mapbox token is configured.
+- Missing marker images show a stable browser warning instead of throwing an
+  unhandled error or exposing machine-specific details.
 - Set a local Mapbox access token in `map-script.js` for manual map rendering, then reset it to an empty string before running verification or committing.
 
 ## Testing and Verification
 
-- GitHub Actions runs the dependency-free map contracts on Node 20 and Node 24
+- GitHub Actions runs the dependency-free map contracts on Node 22 and Node 24
   for pushes to `master` and pull requests.
 - Run `make check` or `make verify` before committing map asset, GeoJSON, or HTML script changes.
+- Run `make test` to execute the dependency-free browser behavior harness for
+  token warnings, layer toggles, and reduced-motion animation handling.
 - Run `make build` for the static map validation gate; it uses the same
   dependency-free validator as `make lint`.
+- GitHub Actions runs `make check` through `.github/workflows/check.yml` on
+  pushes, pull requests, and manual dispatches using Node 22 and Node 24.
 - The verification gate checks local script/style references, marker and
   GeoJSON references, layer/toggle inventory consistency, empty Mapbox token
   state, the no-token browser fallback, dataset inventory coverage, and either
@@ -82,8 +88,12 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   installation because the validator uses Node built-ins only.
 - It also checks that layer toggles are labelled buttons with `aria-pressed`
   state instead of links that only expose state through CSS.
+- Unavailable marker layers expose disabled, unpressed controls instead of
+  claiming that a layer which failed to load is active.
 - It also checks that the animated power-line layer respects
   `prefers-reduced-motion: reduce` and remains static for those users.
+- It executes the no-token, layer-toggle, reduced-motion, and animation paths
+  in a dependency-free Node VM harness.
 - It also allowlists intentional remote browser assets for Mapbox GL JS/CSS and
   Google Fonts so new external script/style references are reviewed explicitly.
 - It also requires a completed canonical plan under `docs/plans/`.
@@ -131,12 +141,15 @@ When the required SDK or runtime is unavailable, use static checks and source re
   language accessibility guard and static `make build` gate.
 - See `docs/plans/2026-06-09-layer-toggle-accessibility.md` for layer menu
   button and `aria-pressed` accessibility coverage.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the GitHub Actions baseline.
 - See `docs/plans/2026-06-10-map-region-accessibility.md` for the labelled map
   region guard.
 - See `docs/plans/2026-06-10-hosted-map-validation.md` for root-independent
-  Node 20/24 hosted map contracts.
+  Node 22/24 hosted map contracts.
 - See `docs/plans/2026-06-10-power-line-reduced-motion.md` for the power-line
   animation accessibility guard.
+- See `docs/plans/2026-06-12-unavailable-layer-controls.md` for disabled control
+  behavior when marker layers fail to load.
 
 ## Contributing
 

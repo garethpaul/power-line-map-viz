@@ -22,6 +22,7 @@ function exists(relativePath, context) {
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 const script = fs.readFileSync('map-script.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
+const readme = fs.readFileSync('README.md', 'utf8');
 const planPath = 'docs/plans/2026-06-08-map-token-and-assets-baseline.md';
 const datasetPlanPath = 'docs/plans/2026-06-08-dataset-inventory-baseline.md';
 const layerInventoryPlanPath = 'docs/plans/2026-06-08-layer-inventory-validation.md';
@@ -32,10 +33,14 @@ const tokenWarningAccessibilityPlanPath = 'docs/plans/2026-06-09-map-token-warni
 const viewportAccessibilityPlanPath = 'docs/plans/2026-06-09-viewport-zoom-accessibility.md';
 const htmlLanguagePlanPath = 'docs/plans/2026-06-09-html-language-accessibility.md';
 const layerToggleAccessibilityPlanPath = 'docs/plans/2026-06-09-layer-toggle-accessibility.md';
+const ciPlanPath = 'docs/plans/2026-06-10-ci-baseline.md';
 const mapRegionAccessibilityPlanPath = 'docs/plans/2026-06-10-map-region-accessibility.md';
 const hostedValidationPlanPath = 'docs/plans/2026-06-10-hosted-map-validation.md';
 const reducedMotionPlanPath = 'docs/plans/2026-06-10-power-line-reduced-motion.md';
+const behaviorTestPlanPath = 'docs/plans/2026-06-12-map-behavior-tests.md';
+const unavailableLayerPlanPath = 'docs/plans/2026-06-12-unavailable-layer-controls.md';
 const workflowPath = '.github/workflows/check.yml';
+const behaviorTestPath = 'scripts/test-map-behavior.js';
 const datasetInventoryPath = 'DATASETS.md';
 const allowedRemoteAssets = new Set([
   'https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js',
@@ -53,13 +58,17 @@ exists(tokenWarningAccessibilityPlanPath, 'map token warning accessibility docs 
 exists(viewportAccessibilityPlanPath, 'viewport accessibility docs plan');
 exists(htmlLanguagePlanPath, 'HTML language accessibility docs plan');
 exists(layerToggleAccessibilityPlanPath, 'layer toggle accessibility docs plan');
+exists(ciPlanPath, 'CI baseline docs plan');
 exists(mapRegionAccessibilityPlanPath, 'map region accessibility docs plan');
 exists(hostedValidationPlanPath, 'hosted map validation docs plan');
 exists(reducedMotionPlanPath, 'power-line reduced-motion docs plan');
+exists(behaviorTestPlanPath, 'map behavior test docs plan');
+exists(unavailableLayerPlanPath, 'unavailable layer controls docs plan');
 exists(workflowPath, 'hosted map validation workflow');
+exists(behaviorTestPath, 'map behavior tests');
 exists(datasetInventoryPath, 'dataset inventory');
 
-for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath]) {
+for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPath, imageInventoryPlanPath, pageTitlePlanPath, remoteAssetPlanPath, tokenWarningAccessibilityPlanPath, viewportAccessibilityPlanPath, htmlLanguagePlanPath, layerToggleAccessibilityPlanPath, ciPlanPath, mapRegionAccessibilityPlanPath, hostedValidationPlanPath, reducedMotionPlanPath, behaviorTestPlanPath, unavailableLayerPlanPath]) {
   if (!fs.existsSync(completedPlanPath)) {
     continue;
   }
@@ -70,31 +79,57 @@ for (const completedPlanPath of [planPath, datasetPlanPath, layerInventoryPlanPa
   }
 }
 
-if (fs.existsSync(workflowPath)) {
-  const workflow = fs.readFileSync(workflowPath, 'utf8');
-  if (!/^permissions:\n  contents: read$/m.test(workflow)) {
-    fail(`${workflowPath} must use read-only repository contents permission`);
-  }
-  if (!workflow.includes('actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10')) {
-    fail(`${workflowPath} must pin the reviewed actions/checkout v6.0.3 commit`);
-  }
-  if (!workflow.includes('actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e')) {
-    fail(`${workflowPath} must pin the reviewed actions/setup-node v6.4.0 commit`);
-  }
-  if (!workflow.includes('node: [20.x, 24.x]')) {
-    fail(`${workflowPath} must cover Node 20 and Node 24`);
-  }
-  if (!/^\s+run: make check$/m.test(workflow)) {
-    fail(`${workflowPath} must run the canonical make check gate`);
-  }
-  if (/\bnpm (?:ci|install)\b/.test(workflow)) {
-    fail(`${workflowPath} must not install dependencies for the built-in-only validator`);
-  }
-}
-
 const datasetInventory = fs.existsSync(datasetInventoryPath)
   ? fs.readFileSync(datasetInventoryPath, 'utf8')
   : '';
+
+if (fs.existsSync(workflowPath)) {
+  const workflow = fs.readFileSync(workflowPath, 'utf8').replace(/\r\n/g, '\n');
+  for (const phrase of [
+    'permissions:\n  contents: read',
+    'cancel-in-progress: true',
+    'runs-on: ubuntu-24.04',
+    'timeout-minutes: 10',
+    'node: [22.x, 24.x]',
+    'actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0',
+    'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e',
+    'persist-credentials: false',
+    'run: make check'
+  ]) {
+    if (!workflow.includes(phrase)) {
+      fail(`${workflowPath} must keep ${phrase}`);
+    }
+  }
+  const expectedActions = [
+    'actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0',
+    'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e'
+  ];
+  const actions = [...workflow.matchAll(/^\s*(?:-\s*)?uses:\s*(\S+)/gm)].map(match => match[1]);
+  if (JSON.stringify(actions) !== JSON.stringify(expectedActions)) {
+    fail(`${workflowPath} must use only the approved pinned checkout and setup-node actions`);
+  }
+  if ((workflow.match(/^permissions:/gm) || []).length !== 1 || /^\s+[\w-]+:\s*write\s*$/m.test(workflow)) {
+    fail(`${workflowPath} must keep one read-only permissions block`);
+  }
+  if ((workflow.match(/persist-credentials: false/g) || []).length !== 1) {
+    fail(`${workflowPath} must disable persisted checkout credentials exactly once`);
+  }
+  if (/\bnpm (?:ci|install)\b/.test(workflow)) {
+    fail(`${workflowPath} must keep the built-in-only validator dependency-free`);
+  }
+}
+
+for (const docsBaselineFile of ['README.md', 'VISION.md', 'SECURITY.md', 'CHANGES.md']) {
+  const docsBaseline = fs.readFileSync(docsBaselineFile, 'utf8');
+  if (!docsBaseline.includes('GitHub Actions')) {
+    fail(`${docsBaselineFile} must document the GitHub Actions baseline`);
+  }
+}
+
+const makefile = fs.readFileSync('Makefile', 'utf8').replace(/\r\n/g, '\n');
+if (!/test: lint\n\tnode scripts\/test-map-behavior\.js/.test(makefile)) {
+  fail('Makefile test target must run the dependency-free map behavior tests');
+}
 
 const geojsonReferences = new Set(
   Array.from(script.matchAll(/['"](geojson\/[^'"]+\.geojson)['"]/g), match => match[1])
@@ -206,6 +241,11 @@ if (!/function\s+showMapTokenWarning\b/.test(script)) {
   fail('map-script.js must expose a browser-visible no-token warning');
 }
 
+if (/if\s*\(error\)\s*throw\s+error/.test(script) ||
+    !script.includes('A map marker image could not be loaded.')) {
+  fail('map image failures must show a stable warning instead of throwing raw errors');
+}
+
 if (!/function\s+prefersReducedMotion\b/.test(script) ||
     !/matchMedia\(['"]\(prefers-reduced-motion:\s*reduce\)['"]\)/.test(script)) {
   fail('map-script.js must detect the browser reduced-motion preference');
@@ -223,8 +263,13 @@ if (!/document\.createElement\(['"]button['"]\)/.test(script)) {
   fail('map-script.js must create button controls for layer toggles');
 }
 
-if (!/link\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) {
-  fail('map-script.js must initialize layer toggles with aria-pressed="true"');
+if (!script.includes("link.disabled = !layerAvailable") ||
+    !script.includes("link.setAttribute('aria-pressed', layerAvailable ? 'true' : 'false')")) {
+  fail('map-script.js must disable unavailable layer toggles and expose their actual pressed state');
+}
+
+if (!readme.includes('Unavailable marker layers expose disabled, unpressed controls')) {
+  fail('README.md must document unavailable marker layer control behavior');
 }
 
 if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]false['"]\)/.test(script)) {
@@ -235,9 +280,19 @@ if (!/this\.setAttribute\(['"]aria-pressed['"],\s*['"]true['"]\)/.test(script)) 
   fail('map-script.js must mark visible layer toggles with aria-pressed="true"');
 }
 
-for (const selector of ['#menu button', '#menu button:last-child', '#menu button:hover', '#menu button.active']) {
+for (const selector of ['#menu button', '#menu button:last-child', '#menu button:hover', '#menu button.active', '#menu button:disabled']) {
   if (!styles.includes(selector)) {
     fail(`styles.css must style layer toggle selector ${selector}`);
+  }
+}
+
+for (const contract of [
+  'getLayer(id) { return this.layers.get(id); }',
+  'assert.equal(missingImage.menu.children[1].disabled, true)',
+  "assert.equal(missingImage.menu.children[1].getAttribute('aria-pressed'), 'false')"
+]) {
+  if (!fs.readFileSync(behaviorTestPath, 'utf8').includes(contract)) {
+    fail(`${behaviorTestPath} must preserve unavailable-layer regression: ${contract}`);
   }
 }
 

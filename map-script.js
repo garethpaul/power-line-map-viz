@@ -27,11 +27,13 @@ function setupLayerToggles(map) {
 
     for (var i = 0; i < toggleableLayerIds.length; i++) {
         var link = document.createElement('button');
+        var layerAvailable = Boolean(map.getLayer(toggleableLayerIds[i]['id']));
         link.type = 'button';
-        link.className = 'active';
+        link.className = layerAvailable ? 'active' : '';
         link.textContent = toggleableLayerIds[i]['name'];
         link.dataset.layerId = toggleableLayerIds[i]['id'];
-        link.setAttribute('aria-pressed', 'true');
+        link.disabled = !layerAvailable;
+        link.setAttribute('aria-pressed', layerAvailable ? 'true' : 'false');
 
         // Handle clicks on the layer toggle button.
         link.onclick = function (e) {
@@ -109,7 +111,10 @@ function initializeMap() {
         // Load Power Stations
         var powerStationsUrl = 'geojson/power_stations.geojson';
         map.loadImage("images/power-stations.png", function(error, image) { //this is where we load the image file
-        if (error) throw error;
+        if (error) {
+            showMapTokenWarning('A map marker image could not be loaded. Check the local image assets and reload the page.');
+            return;
+        }
             map.addImage("custom-marker", image);
             map.addLayer({
             'id': 'power_stations',
@@ -129,7 +134,10 @@ function initializeMap() {
         // Load Cell Towers
         var cellTowersUrl = 'geojson/cell_towers.geojson';
         map.loadImage("images/cell-towers.png", function(error, image) { //this is where we load the image file
-        if (error) throw error;
+        if (error) {
+            showMapTokenWarning('A map marker image could not be loaded. Check the local image assets and reload the page.');
+            return;
+        }
             map.addImage("cell-tower", image);
             map.addLayer({
             'id': 'cell_towers',
