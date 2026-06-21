@@ -3,7 +3,8 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 ATTACKER_ROOT=/tmp/power-line-map-attacker-root
-TEMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/Power Line Map's [gate] XXXX")
+TEMP_BASE=${TMPDIR:-/tmp}
+TEMP_ROOT=$(mktemp -d "${TEMP_BASE%/}/Power Line Map's [gate] XXXX")
 trap 'rm -rf "$TEMP_ROOT"' EXIT HUP INT TERM
 CHECKOUT="$TEMP_ROOT/exact head"
 mkdir -p "$CHECKOUT"
@@ -25,4 +26,7 @@ if make --no-print-directory --dry-run --file "$CHECKOUT/Makefile" MAKEFILE_LIST
 grep -Fq "MAKEFILE_LIST must not be overridden" "$TEMP_ROOT/command.out"
 if MAKEFILE_LIST=/tmp/untrusted make --environment-overrides --no-print-directory --dry-run --file "$CHECKOUT/Makefile" check >"$TEMP_ROOT/environment.out" 2>&1; then exit 1; fi
 grep -Fq "MAKEFILE_LIST must not be overridden" "$TEMP_ROOT/environment.out"
-printf '%s\n' "Makefile root tests passed: 18 target/override cases and 2 MAKEFILE_LIST rejection cases"
+printf '%s\n' '# earlier makefile' >"$TEMP_ROOT/earlier.mk"
+if make --no-print-directory --dry-run --file "$TEMP_ROOT/earlier.mk" --file "$CHECKOUT/Makefile" check >"$TEMP_ROOT/multiple.out" 2>&1; then exit 1; fi
+grep -Fq "Makefile must be loaded as the only makefile" "$TEMP_ROOT/multiple.out"
+printf '%s\n' "Makefile root tests passed: 18 target/override cases and 3 Makefile authority rejection cases"

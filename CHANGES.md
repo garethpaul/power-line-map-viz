@@ -4,6 +4,8 @@
 
 - Hardened all five pre-existing Make gates against `MAKEFILE_LIST` and
   `REPO_ROOT` redirection without changing map behavior or datasets.
+- Failed closed when an additional `-f` makefile would make root ownership
+  ambiguous.
 
 ## 2026-06-17
 
