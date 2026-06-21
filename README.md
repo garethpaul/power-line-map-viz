@@ -134,6 +134,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 ## Maintenance Notes
 
+- Make gates reject caller-controlled `MAKEFILE_LIST` and `REPO_ROOT` values
+  before validating map assets or browser behavior.
+
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `DATASETS.md` before adding or refreshing infrastructure layers.
