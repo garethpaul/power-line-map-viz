@@ -1,6 +1,12 @@
-.PHONY: check lint test build verify
+.PHONY: check lint test build root-test verify
 
-override REPO_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+ifneq ($(origin MAKEFILE_LIST),file)
+$(error MAKEFILE_LIST must not be overridden)
+endif
+override REPO_ROOT := $(shell path='$(subst ','"'"',$(MAKEFILE_LIST))'; path=$$(printf '%s' "$$path" | /usr/bin/sed 's/^ //'); if [ -f "$$path" ] && [ "$$(/usr/bin/basename -- "$$path")" = Makefile ]; then directory=$$(/usr/bin/dirname -- "$$path"); CDPATH= cd -- "$$directory" && /bin/pwd -P; fi)
+ifeq ($(strip $(REPO_ROOT)),)
+$(error Makefile must be loaded as the only makefile)
+endif
 
 check: verify
 
@@ -18,4 +24,7 @@ test: lint
 
 build: lint
 
-verify: lint test build
+root-test:
+	cd "$(REPO_ROOT)" && scripts/test-makefile-root.sh
+
+verify: lint test build root-test

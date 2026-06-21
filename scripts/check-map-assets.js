@@ -321,8 +321,14 @@ for (const docsBaselineFile of ['README.md', 'VISION.md', 'SECURITY.md', 'CHANGE
 }
 
 const makefile = fs.readFileSync('Makefile', 'utf8').replace(/\r\n/g, '\n');
-if (!/^override REPO_ROOT := \$\(abspath \$\(dir \$\(lastword \$\(MAKEFILE_LIST\)\)\)\)$/m.test(makefile)) {
-  fail('Makefile must resolve an override-protected repository root from its own path');
+if (!/^ifneq \(\$\(origin MAKEFILE_LIST\),file\)\n\$\(error MAKEFILE_LIST must not be overridden\)$/m.test(makefile)) {
+  fail('Makefile must reject caller-controlled MAKEFILE_LIST values');
+}
+if (!/^override REPO_ROOT := \$\(shell path=/m.test(makefile) || !makefile.includes('[ -f "$$path" ]') || !makefile.includes('/usr/bin/basename') || !makefile.includes('/usr/bin/dirname') || !makefile.includes('/bin/pwd -P')) {
+  fail('Makefile must canonicalize an override-protected repository root from its own path');
+}
+if (!makefile.includes('$(error Makefile must be loaded as the only makefile)')) {
+  fail('Makefile must fail closed when another makefile is loaded');
 }
 const lintTarget = makefile.match(/^lint:\n((?:\t.*\n)+)/m);
 for (const command of [
@@ -339,6 +345,21 @@ for (const command of [
 const testTarget = makefile.match(/^test: lint\n((?:\t.*\n)+)/m);
 if (!testTarget || !testTarget[1].includes('\tcd "$(REPO_ROOT)" && node scripts/test-map-behavior.js\n')) {
   fail('Makefile test target must run the dependency-free map behavior tests');
+}
+if (!/^root-test:\n\tcd "\$\(REPO_ROOT\)" && scripts\/test-makefile-root\.sh$/m.test(makefile)) {
+  fail('Makefile must expose the root regression gate');
+}
+if (!/^verify: lint test build root-test$/m.test(makefile)) {
+  fail('Makefile verify target must include the root regression gate');
+}
+
+const rootTest = fs.readFileSync('scripts/test-makefile-root.sh', 'utf8');
+for (const contract of ['Power Line Map', '18 target/override cases', '3 Makefile authority rejection cases', 'MAKEFILE_LIST must not be overridden', 'Makefile must be loaded as the only makefile']) {
+  if (!rootTest.includes(contract)) fail(`Makefile root test must preserve: ${contract}`);
+}
+const rootPlan = fs.readFileSync('docs/plans/2026-06-21-safe-make-root.md', 'utf8');
+for (const evidence of ['Status: Completed', 'five pre-existing public Make targets plus the root regression gate', '18 target and `REPO_ROOT` override cases', 'Command-line and environment `MAKEFILE_LIST` overrides failed closed', 'Additional makefiles fail closed']) {
+  if (!rootPlan.includes(evidence)) fail(`safe Make root plan must preserve: ${evidence}`);
 }
 
 const geojsonReferences = new Set(
