@@ -1,5 +1,45 @@
 # Changes
 
+## 2026-06-26 11:57 PDT - P1 - Remove tracked-token setup workflow
+
+### Summary
+Replaced the documented practice of editing `map-script.js` with fail-closed,
+same-origin browser storage for local Mapbox token configuration.
+
+### Work completed
+- Load and trim `powerLineMapboxAccessToken` from browser storage.
+- Fall back to the accessible no-token warning when storage is absent or denied.
+- Added executable and static contracts for configured and blocked storage.
+- Updated setup, security, vision, and agent guidance.
+
+### Threads
+- Delegated: none.
+
+### Files changed
+- `map-script.js` — added fail-closed local token loading.
+- `scripts/test-map-behavior.js` — covered configured and denied storage.
+- `scripts/check-map-assets.js` — prohibited literal tokens and guarded behavior.
+- `README.md`, `SECURITY.md`, `VISION.md`, `AGENTS.md` — replaced tracked edits.
+- `docs/plans/2026-06-26-browser-storage-mapbox-token.md` — recorded design and evidence.
+
+### Validation
+- Stored-token regression failed with zero initialized maps before implementation.
+- Storage-denial regression failed with an uncaught error before the fallback.
+- All Make gates and the external-directory gate — passed.
+- Literal-token and valid catch-rethrow mutations — rejected as intended.
+- `git diff --check` — passed.
+
+### Bugs / findings
+- P1: setup guidance encouraged placing an account token in tracked source and
+  relying on manual cleanup before every commit.
+
+### Blockers
+- No live Mapbox token or network map rendering was used.
+
+### Next action
+- Run all local gates and hostile mutations, then require hosted Node 22/24 and
+  CodeQL on the exact PR head before merge.
+
 ## 2026-06-21
 
 - Hardened all five pre-existing Make gates against `MAKEFILE_LIST` and

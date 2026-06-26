@@ -53,7 +53,17 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - The checked-in page shows a browser warning until a Mapbox token is configured.
 - Missing marker images show a stable browser warning instead of throwing an
   unhandled error or exposing machine-specific details.
-- Set a local Mapbox access token in `map-script.js` for manual map rendering, then reset it to an empty string before running verification or committing.
+- Keep Mapbox access tokens out of source files. After serving the directory,
+  set a token for that local origin in the browser console and reload:
+
+  ```js
+  localStorage.setItem('powerLineMapboxAccessToken', 'pk.your-token')
+  location.reload()
+  ```
+
+  Remove it with `localStorage.removeItem('powerLineMapboxAccessToken')` when
+  finished. If browser storage is unavailable, the page fails closed to the
+  existing accessible no-token warning.
 
 ## Testing and Verification
 
@@ -77,6 +87,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Power Line Map instead of a generic placeholder.
 - It also checks that the no-token Mapbox warning remains an accessible status
   live region.
+- It checks that Mapbox tokens come from fail-closed browser storage rather
+  than a tracked source literal.
 - It also checks that the viewport keeps browser zoom available and uses
   `width=device-width`.
 - It also checks that the root HTML element declares `lang="en"` for assistive

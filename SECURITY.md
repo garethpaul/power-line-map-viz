@@ -70,6 +70,10 @@ next paint, preserving the user's current accessibility preference.
 
 Dependency updates should come from trusted package managers and should keep lockfiles in sync when lockfiles exist. Do not commit credentials, private keys, tokens, generated secrets, or machine-local configuration. If a vulnerability depends on a compromised package, typosquatting risk, insecure transitive dependency, or unsafe build step, include the package name, affected version, and the path through which it is used.
 
+Mapbox access tokens should be configured through same-origin browser storage,
+not edited into tracked JavaScript. Storage denial must fall back to the
+accessible no-token warning without exposing the storage error.
+
 ## Safe Research Guidelines
 
 Good-faith research is welcome when it stays within these boundaries:

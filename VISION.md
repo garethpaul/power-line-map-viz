@@ -43,6 +43,8 @@ Priority:
 - Bind pinned Mapbox JavaScript and CSS to reviewed Subresource Integrity hashes
 - Avoid committing real Mapbox access tokens
 - Keep no-token local browsing explicit instead of silently blank
+- Keep local Mapbox token setup out of tracked source through fail-closed
+  browser storage
 - Keep the no-token warning accessible as a status live region
 - Keep browser zoom available for the static map page
 - Keep the static map page language declared for accessibility tooling
@@ -58,7 +60,6 @@ Priority:
 
 Next priorities:
 
-- Add README setup notes for Mapbox token configuration
 - Replace unknown dataset source/freshness notes with concrete source URLs,
   licenses, and refresh dates
 - Add a small fixture GeoJSON layer for local demos without Git LFS

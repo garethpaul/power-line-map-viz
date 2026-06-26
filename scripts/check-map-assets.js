@@ -468,7 +468,32 @@ if (/mapboxgl\.accessToken\s*=\s*['"][^'"]+['"]/.test(script)) {
 }
 
 if (/mapboxAccessToken\s*=\s*['"][^'"]+['"]/.test(script)) {
-  fail('map-script.js must keep mapboxAccessToken empty by default');
+  fail('map-script.js must not contain a literal Mapbox access token');
+}
+
+for (const contract of [
+  'function getLocalMapboxAccessToken()',
+  "window.localStorage.getItem('powerLineMapboxAccessToken')",
+  "typeof token === 'string' ? token.trim() : ''",
+  'var mapboxAccessToken = getLocalMapboxAccessToken()',
+  "catch (error)"
+]) {
+  if (!script.includes(contract)) {
+    fail(`map-script.js must load Mapbox tokens from fail-closed browser storage: ${contract}`);
+  }
+}
+
+const behaviorTests = fs.readFileSync(behaviorTestPath, 'utf8');
+for (const contract of [
+  "storedToken: '  test-token  '",
+  "assert.equal(configured.sandbox.mapboxgl.accessToken, 'test-token')",
+  "storageError: new Error('storage denied')",
+  'assert.equal(blockedStorage.maps.length, 0)',
+  'assert.match(blockedStorage.warning.textContent, /browser storage/)'
+]) {
+  if (!behaviorTests.includes(contract)) {
+    fail(`${behaviorTestPath} must preserve browser-storage token regressions: ${contract}`);
+  }
 }
 
 const tokenWarningTag = indexHtml.match(/<[^>]+id=['"]map-token-warning['"][^>]*>/);

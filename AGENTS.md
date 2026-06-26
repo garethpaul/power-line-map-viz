@@ -45,6 +45,7 @@
 ## Safety and gotchas
 
 - Detected references to Mapbox. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+- Keep local Mapbox tokens in same-origin browser storage; do not restore a tracked token literal.
 - `make check` allowlists the browser's remote script/style assets so additional external dependencies cannot be added silently.
 - See `docs/plans/2026-06-12-mapbox-subresource-integrity.md` for the remote
   Mapbox byte-integrity boundary and refresh procedure.
