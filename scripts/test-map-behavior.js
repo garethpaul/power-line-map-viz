@@ -22,7 +22,7 @@ function createButton() {
   };
 }
 
-function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable = true, reducedMotion = false } = {}) {
+function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable = true, reducedMotion = false, storageError = null, storedToken = '' } = {}) {
   const warning = { hidden: true, textContent: '' };
   const menu = { hidden: true, children: [], appendChild(child) { this.children.push(child); } };
   const clearedIntervals = [];
@@ -81,6 +81,13 @@ function loadMapScript({ deferImages = false, imageError = null, mapboxAvailable
       clearedIntervals.push(intervalId);
     },
     window: {
+      localStorage: {
+        getItem(key) {
+          assert.equal(key, 'powerLineMapboxAccessToken');
+          if (storageError) throw storageError;
+          return storedToken;
+        }
+      },
       matchMedia(query) {
         assert.equal(query, '(prefers-reduced-motion: reduce)');
         return { matches: reducedMotion };
@@ -110,6 +117,15 @@ function click(button) {
 }
 
 function main() {
+  const configured = loadMapScript({ storedToken: '  test-token  ' });
+  assert.equal(configured.maps.length, 1);
+  assert.equal(configured.sandbox.mapboxgl.accessToken, 'test-token');
+
+  const blockedStorage = loadMapScript({ storageError: new Error('storage denied') });
+  assert.equal(blockedStorage.maps.length, 0);
+  assert.equal(blockedStorage.warning.hidden, false);
+  assert.match(blockedStorage.warning.textContent, /browser storage/);
+
   const missingLibrary = loadMapScript({ mapboxAvailable: false });
   assert.equal(missingLibrary.warning.hidden, false);
   assert.match(missingLibrary.warning.textContent, /Mapbox GL JS did not load/);

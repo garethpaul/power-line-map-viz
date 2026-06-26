@@ -1,4 +1,20 @@
-var mapboxAccessToken = '';
+function getLocalMapboxAccessToken() {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    try {
+        if (!window.localStorage) {
+            return '';
+        }
+        var token = window.localStorage.getItem('powerLineMapboxAccessToken');
+        return typeof token === 'string' ? token.trim() : '';
+    } catch (error) {
+        return '';
+    }
+}
+
+var mapboxAccessToken = getLocalMapboxAccessToken();
 
 function showMapTokenWarning(message) {
     var warning = document.getElementById('map-token-warning');
@@ -214,7 +230,7 @@ function initializeMap() {
 if (typeof mapboxgl === 'undefined') {
     showMapTokenWarning('Mapbox GL JS did not load. Check network access or serve this page where the Mapbox library can be reached.');
 } else if (!mapboxAccessToken) {
-    showMapTokenWarning('Add a local Mapbox access token in map-script.js to view the map. Keep the checked-in token empty before committing changes.');
+    showMapTokenWarning('Add a local Mapbox access token to browser storage to view the map. Keep access tokens out of checked-in files.');
 } else {
     initializeMap();
 }
